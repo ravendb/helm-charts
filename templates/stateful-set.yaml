@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: fullname
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "ravendb.name" . }}
+  serviceName: {{ include "ravendb.name" . }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ include "ravendb.name" . }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: ravendb/ravendb:latest
+          ports:
+          - containerPort: 8080
+            name: http
+          - containerPort: 38888
+            name: tcp
+          volumeMounts:
+          - name: {{ include "ravendb.name" . }}
+            mountPath: /opt/RavenDB/Server/RavenData
+          env:
+            - name: RAVEN_Setup_Mode
+              value: 'NONE'
+            - name: RAVEN_License_Eula_Accepted
+              value: 'true'
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ include "ravendb.name" . }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+         storage: {{ .Values.persistence.storage }}
