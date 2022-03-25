@@ -4,3 +4,8 @@ ingress:
 
 persistence:
   storage: 2G
+
+nodeIndexes:
+  - 0
+  - 1
+  - 2

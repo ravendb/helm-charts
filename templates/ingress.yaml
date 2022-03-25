@@ -1,25 +1,44 @@
 {{- $paths := .Values.ingress.paths -}}
+{{- $shortname := include "ravendb.name" . -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "ravendb.fullname" }} 
+  name: {{ include "ravendb.fullname" . }} 
   labels:
-    app.kubernetes.io/name: {{ }}
+    app.kubernetes.io/name: {{ include "ravendb.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   ingressClassName: nginx
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ . }}
+    - host: a.localhost
       http:
         paths:
-        {{- range $paths}}
           - pathType: Prefix
-            path: {{ . }}
+            path: /
             backend:
-              service:
-                name: {{ include "ravendb.name" . }}
+              service: 
+                name: {{ $shortname }}-0
                 port:
                   number: 8080
-        {{- end }}
-  {{- end }}
+            
+    - host: b.localhost
+      http:
+        paths:
+          - pathType: Prefix
+            path: / 
+            backend:
+              service: 
+                name: {{ $shortname }}-1
+                port:
+                  number: 8080 
+
+    - host: c.localhost
+      http:
+        paths:
+          - pathType: Prefix
+            path: / 
+            backend:
+              service: 
+                name: {{ $shortname }}-2
+                port:
+                  number: 8080 

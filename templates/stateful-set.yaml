@@ -1,13 +1,18 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: fullname
+  name: {{ include "ravendb.fullname" . }}
+data:
+  nodeIndexes:
+    - 0
+    - 1
+    - 2
 spec:
   selector:
     matchLabels:
       app: {{ include "ravendb.name" . }}
   serviceName: {{ include "ravendb.name" . }}
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -29,6 +34,7 @@ spec:
               value: 'NONE'
             - name: RAVEN_License_Eula_Accepted
               value: 'true'
+            
   volumeClaimTemplates:
   - metadata:
       name: {{ include "ravendb.name" . }}
