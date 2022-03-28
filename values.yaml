@@ -1,6 +1,5 @@
 ingress:
-  hosts: [ localhost ]
-  paths: [ / ]
+  host: [ localhost ]
 
 persistence:
   storage: 2G

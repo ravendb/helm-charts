@@ -1,0 +1,42 @@
+{{- $shortname := include "ravendb.name" . -}}
+{{- $fullname := include "ravendb.fullname" . -}}
+{{- range .Values.nodeIndexes }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ $.fullname }}-{{.}}"
+  labels:
+    heritage: {{$.Release.Service | quote }}
+    release: {{$.Release.Name | quote }}
+    chart: "{{$.Chart.Name}}-{{$.Chart.Version}}"
+    app: {{ $.shortname | quote }}
+spec:
+  containers:
+  - name: {{ $.Chart.Name }} .
+    image: ravendb/ravendb:latest
+    ports:
+    - containerPort: 8080
+      name: http
+    - containerPort: 38888
+      name: tcp
+    volumeMounts:
+    - name: "{{$.shortname}}-{{.}}"
+      mountPath: /opt/RavenDB/Server/RavenData
+    env:
+    - name: RAVEN_Setup_Mode
+      value: 'NONE'
+    - name: RAVEN_License_Eula_Accepted
+      value: 'true'
+    - name: RAVEN_PublicServerUrl
+      value: "http://{{$.shortname}}-{{.}}:8080"
+    - name: RAVEN_PublicServerUrl.Tcp.Cluster
+      value: "tcp://{{$.shortname}}-{{.}}:38888"
+  volumes:
+  - metadata:
+      name: "{{$.shortname}}-{{.}}"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ $.Values.persistence.storage }}
+{{- end }}

@@ -42,3 +42,4 @@ spec:
                 name: {{ $shortname }}-2
                 port:
                   number: 8080 
+# todo: make dictionary and assign numbers to dns node tags {1:"a", 2:"b", 3:"c" ...}
