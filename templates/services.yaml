@@ -1,20 +1,63 @@
 {{- $shortname := include "ravendb.name" . -}}
-{{- $fullname := include "ravendb.fullname" . -}}
 
-{{- range .Values.nodeIndexes }}
-  apiVersion: v1
-  kind: Service
-  metadata:
-    name: "{{$.shortname}}-{{.}}"
-    labels:
-      app: {{ $.shortname }}
-  spec:
-    ports:
-    - port: 8080
-      name: http
-    - port: 38888
-      name: tcp
-    selector:
-      app: {{ $.shortname }}
-      name: "{{$.fullname}}-0"
-{{- end }}
+# {{- range .Values.nodesTags }}
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: "{{$shortname}}-{{.}}"
+#   labels:
+#     app: "{{$shortname}}"
+# spec:
+#   ports:
+#   - port: 8080
+#     name: http
+#   - port: 38888
+#     name: tcp
+#   selector:
+#     nodeTag: "{{.}}"
+# {{- end }}
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ravendb-0
+  labels:
+    app: ravendb
+spec:
+  ports:
+  - port: 8080
+    name: http
+  - port: 38888
+    name: tcp
+  selector:
+    nodeTag: "A"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ravendb-1
+  labels:
+    app: ravendb
+spec:
+  ports:
+  - port: 8080
+    name: http
+  - port: 38888
+    name: tcp
+  selector:
+    nodeTag: "B"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ravendb-2
+  labels:
+    app: ravendb
+spec:
+  ports:
+  - port: 8080
+    name: http
+  - port: 38888
+    name: tcp
+  selector:
+    nodeTag: "C"

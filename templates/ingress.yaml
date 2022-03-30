@@ -17,7 +17,7 @@ spec:
             path: /
             backend:
               service: 
-                name: {{ $shortname }}-0
+                name: ravendb-0
                 port:
                   number: 8080
             

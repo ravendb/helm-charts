@@ -4,7 +4,11 @@ ingress:
 persistence:
   storage: 2G
 
-nodeIndexes:
-  - 0
-  - 1
-  - 2
+# Instances
+nodes:
+- nodeTag: "A"
+  nodeIndex: 0
+- nodeTag: "B"
+  nodeIndex: 1
+- nodeTag: "C"
+  nodeIndex: 2
