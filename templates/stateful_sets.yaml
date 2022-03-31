@@ -1,0 +1,205 @@
+{{- $shortname := include "ravendb.name" . -}}
+{{- $fullname := include "ravendb.fullname" . -}}
+
+## {{- range .Values.nodes }}
+## apiVersion: v1
+## kind: Pod
+## metadata:
+##   name: "{{ $fullname }}-{{.nodeIndex}}"
+##   labels:
+##     heritage: {{$.Release.Service | quote }}
+##     release: {{$.Release.Name | quote }}
+##     chart: "{{$.Chart.Name}}-{{$.Chart.Version}}"
+##     app: "{{$shortname}}"
+##     nodeTag: "{{.nodeTag}}"
+## spec:
+##   containers:
+##   - name: "{{ $.Chart.Name }}-{{.nodeIndex}}"
+##     image: ravendb/ravendb:latest
+##     ports:
+##     - containerPort: 8080
+##       name: http
+##     - containerPort: 38888
+##       name: tcp
+##     #volumeMounts:
+##     #- name: "ravendb-{{.}}"
+##     #  mountPath: /opt/RavenDB/Server/RavenData
+##     env:
+##     - name: RAVEN_Setup_Mode
+##       value: 'NONE'
+##     - name: RAVEN_License_Eula_Accepted
+##       value: 'true'
+##     - name: RAVEN_PublicServerUrl
+##       value: "http://{{$shortname}}-{{.nodeIndex}}:8080"
+##     - name: RAVEN_PublicServerUrl.Tcp.Cluster
+##       value: "tcp://{{$shortname}}-{{.nodeIndex}}:38888"
+##{{- end }}
+
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#       name: "ps-{{$shortname}}"
+# parameters:
+#   type: 
+#   replication-type: none
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: {{$shortname}}-pvc
+# spec:
+#   accessModes: [ "ReadWriteOnce" ]
+#   storageClassName: "ps-{{$shortname}}"
+#   resources:
+#     requests:
+#       storage: 10Gi
+# ---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{$fullname}}-0"
+  labels:
+    heritage: {{$.Release.Service | quote }}
+    release: {{$.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{$shortname}}
+    nodeTag: "A"
+spec:
+  selector:
+    matchLabels:
+      nodeTag: "A"
+  serviceName: "{{$shortname}}-0"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        nodeTag: "A"
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: ravendb/ravendb:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 38888
+          name: tcp
+        volumeMounts:
+          - name: "{{$shortname}}"
+            mountPath: /opt/RavenDB/Server/RavenData
+        env:
+        - name: RAVEN_Setup_Mode
+          value: 'NONE'
+        - name: RAVEN_License_Eula_Accepted
+          value: 'true'
+        - name: RAVEN_PublicServerUrl
+          value: "http://{{$shortname}}-0:8080"
+        - name: RAVEN_PublicServerUrl.Tcp.Cluster
+          value: "tcp://{{$shortname}}-0:38888"
+  volumeClaimTemplates:
+    - metadata:
+        name: {{$shortname}}
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{$fullname}}-1"
+  labels:
+    heritage: {{$.Release.Service | quote }}
+    release: {{$.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{$shortname}}
+    nodeTag: "B"
+spec:
+  selector:
+    matchLabels:
+      nodeTag: "B"
+  serviceName: "{{$shortname}}-1"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        nodeTag: "B"
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: ravendb/ravendb:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 38888
+          name: tcp
+        volumeMounts:
+          - name: "{{$shortname}}"
+            mountPath: /opt/RavenDB/Server/RavenData
+        env:
+        - name: RAVEN_Setup_Mode
+          value: 'NONE'
+        - name: RAVEN_License_Eula_Accepted
+          value: 'true'
+        - name: RAVEN_PublicServerUrl
+          value: "http://{{$shortname}}-1:8080"
+        - name: RAVEN_PublicServerUrl.Tcp.Cluster
+          value: "tcp://{{$shortname}}-1:38888"
+  volumeClaimTemplates:
+    - metadata:
+        name: {{$shortname}}
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{$fullname}}-2"
+  labels:
+    heritage: {{$.Release.Service | quote }}
+    release: {{$.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{$shortname}}
+    nodeTag: "C"
+spec:
+  selector:
+    matchLabels:
+      nodeTag: "C"
+  serviceName: "{{$shortname}}-2"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        nodeTag: "C"
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: ravendb/ravendb:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 38888
+          name: tcp
+        volumeMounts:
+          - name: "{{$shortname}}"
+            mountPath: /opt/RavenDB/Server/RavenData
+        env:
+        - name: RAVEN_Setup_Mode
+          value: 'NONE'
+        - name: RAVEN_License_Eula_Accepted
+          value: 'true'
+        - name: RAVEN_PublicServerUrl
+          value: "http://{{$shortname}}-2:8080"
+        - name: RAVEN_PublicServerUrl.Tcp.Cluster
+          value: "tcp://{{$shortname}}-2:38888"
+  volumeClaimTemplates:
+    - metadata:
+        name: {{$shortname}}
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi
