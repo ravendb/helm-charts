@@ -77,7 +77,7 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: ravendb/ravendb:latest
+        image: ravendb/ravendb:latest 
         ports:
         - containerPort: 8080
           name: http
@@ -103,6 +103,30 @@ spec:
         resources:
           requests:
             storage: 5Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "sidecar"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{$shortname}}
+spec:
+  volumes:
+    - name: {{$shortname}}-scripts
+      configMap:
+        name: {{$shortname}}
+  restartPolicy: OnFailure
+  containers:
+  - name: main
+    image: "ubuntu:latest"
+    command: ["/bin/bash"]
+    args: ["/usr/scripts/create-cluster.sh"]
+    volumeMounts:
+      - name: {{$shortname}}-scripts
+        mountPath: /usr/scripts
 ---
 apiVersion: apps/v1
 kind: StatefulSet

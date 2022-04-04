@@ -1,0 +1,14 @@
+{{- $shortname := include "ravendb.name" . -}}
+{{- $fullname := include "ravendb.fullname" . -}}
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{$shortname}}
+  labels:
+    app: {{$shortname}}
+    heritage: {{$.Release.Service | quote }}
+    release: {{$.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+data:
+{{ (.Files.Glob "scripts/create-cluster.sh").AsConfig | indent 2 }}
