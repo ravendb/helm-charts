@@ -1,6 +1,10 @@
 ingress:
   host: [ localhost ]
 
+domain: "poisson.development.run"
+ravenVersion: latest
+licenseFileName: misc/license.json
+
 persistence:
   storage: 2G
 
@@ -12,3 +16,4 @@ nodes:
   nodeIndex: 1
 - nodeTag: "C"
   nodeIndex: 2
+  

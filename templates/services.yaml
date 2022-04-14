@@ -25,9 +25,10 @@ metadata:
     app: ravendb
 spec:
   ports:
-  - port: 8080
+  - port: 80
     name: http
   - port: 38888
+    protocol: TCP
     name: tcp
   selector:
     nodeTag: "A"
@@ -40,10 +41,11 @@ metadata:
     app: ravendb
 spec:
   ports:
-  - port: 8080
+  - port: 80
     name: http
   - port: 38888
     name: tcp
+    protocol: TCP
   selector:
     nodeTag: "B"
 ---
@@ -55,9 +57,10 @@ metadata:
     app: ravendb
 spec:
   ports:
-  - port: 8080
+  - port: 80
     name: http
   - port: 38888
+    protocol: TCP
     name: tcp
   selector:
     nodeTag: "C"

@@ -1,59 +1,6 @@
 {{- $shortname := include "ravendb.name" . -}}
 {{- $fullname := include "ravendb.fullname" . -}}
 
-## {{- range .Values.nodes }}
-## apiVersion: v1
-## kind: Pod
-## metadata:
-##   name: "{{ $fullname }}-{{.nodeIndex}}"
-##   labels:
-##     heritage: {{$.Release.Service | quote }}
-##     release: {{$.Release.Name | quote }}
-##     chart: "{{$.Chart.Name}}-{{$.Chart.Version}}"
-##     app: "{{$shortname}}"
-##     nodeTag: "{{.nodeTag}}"
-## spec:
-##   containers:
-##   - name: "{{ $.Chart.Name }}-{{.nodeIndex}}"
-##     image: ravendb/ravendb:latest
-##     ports:
-##     - containerPort: 8080
-##       name: http
-##     - containerPort: 38888
-##       name: tcp
-##     #volumeMounts:
-##     #- name: "ravendb-{{.}}"
-##     #  mountPath: /opt/RavenDB/Server/RavenData
-##     env:
-##     - name: RAVEN_Setup_Mode
-##       value: 'NONE'
-##     - name: RAVEN_License_Eula_Accepted
-##       value: 'true'
-##     - name: RAVEN_PublicServerUrl
-##       value: "http://{{$shortname}}-{{.nodeIndex}}:8080"
-##     - name: RAVEN_PublicServerUrl.Tcp.Cluster
-##       value: "tcp://{{$shortname}}-{{.nodeIndex}}:38888"
-##{{- end }}
-
-# apiVersion: storage.k8s.io/v1
-# kind: StorageClass
-# metadata:
-#       name: "ps-{{$shortname}}"
-# parameters:
-#   type: 
-#   replication-type: none
-# ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: {{$shortname}}-pvc
-# spec:
-#   accessModes: [ "ReadWriteOnce" ]
-#   storageClassName: "ps-{{$shortname}}"
-#   resources:
-#     requests:
-#       storage: 10Gi
-# ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -75,14 +22,16 @@ spec:
       labels:
         nodeTag: "A"
     spec:
+      dnsPolicy: Default
       containers:
       - name: {{ .Chart.Name }}
-        image: ravendb/ravendb:latest 
+        image: "ravendb/ravendb:{{.Values.ravenVersion}}"
         ports:
         - containerPort: 8080
           name: http
         - containerPort: 38888
           name: tcp
+          protocol: TCP
         volumeMounts:
           - name: "{{$shortname}}"
             mountPath: /opt/RavenDB/Server/RavenData
@@ -91,10 +40,18 @@ spec:
           value: 'NONE'
         - name: RAVEN_License_Eula_Accepted
           value: 'true'
+        - name: RAVEN_License
+          value: {{ .Files.Get "misc/license.json" | toPrettyJson }}
+        - name: RAVEN_ARGS
+          value: --Security.UnsecuredAccessAllowed=PublicNetwork
+        - name: RAVEN_ServerUrl
+          value: "http://0.0.0.0:80"
+        - name: RAVEN_ServerUrl_Tcp
+          value: "tcp://0.0.0.0:38888"
         - name: RAVEN_PublicServerUrl
-          value: "http://{{$shortname}}-0:8080"
-        - name: RAVEN_PublicServerUrl.Tcp.Cluster
-          value: "tcp://{{$shortname}}-0:38888"
+          value: "http://a.{{.Values.domain}}:80"
+        - name: RAVEN_PublicServerUrl_Tcp
+          value: "tcp://a-tcp.{{.Values.domain}}:80"
   volumeClaimTemplates:
     - metadata:
         name: {{$shortname}}
@@ -103,30 +60,6 @@ spec:
         resources:
           requests:
             storage: 5Gi
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: "sidecar"
-  labels:
-    heritage: {{.Release.Service | quote }}
-    release: {{.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    app: {{$shortname}}
-spec:
-  volumes:
-    - name: {{$shortname}}-scripts
-      configMap:
-        name: {{$shortname}}
-  restartPolicy: OnFailure
-  containers:
-  - name: main
-    image: "ubuntu:latest"
-    command: ["/bin/bash"]
-    args: ["/usr/scripts/create-cluster.sh"]
-    volumeMounts:
-      - name: {{$shortname}}-scripts
-        mountPath: /usr/scripts
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -149,13 +82,15 @@ spec:
       labels:
         nodeTag: "B"
     spec:
+      dnsPolicy: Default
       containers:
       - name: {{ .Chart.Name }}
-        image: ravendb/ravendb:latest
+        image: "ravendb/ravendb:{{.Values.ravenVersion}}"
         ports:
         - containerPort: 8080
           name: http
         - containerPort: 38888
+          protocol: TCP
           name: tcp
         volumeMounts:
           - name: "{{$shortname}}"
@@ -165,10 +100,20 @@ spec:
           value: 'NONE'
         - name: RAVEN_License_Eula_Accepted
           value: 'true'
+        - name: RAVEN_License
+          value: {{ .Files.Get "misc/license.json" | toPrettyJson }}
+        - name: RAVEN_ARGS
+          value: --Security.UnsecuredAccessAllowed=PublicNetwork
+        - name: RAVEN_ServerUrl
+          value: "http://0.0.0.0:80"
+        - name: RAVEN_ServerUrl_Tcp
+          value: "tcp://0.0.0.0:38888"
         - name: RAVEN_PublicServerUrl
-          value: "http://{{$shortname}}-1:8080"
-        - name: RAVEN_PublicServerUrl.Tcp.Cluster
-          value: "tcp://{{$shortname}}-1:38888"
+          value: "http://b.{{.Values.domain}}:80"
+        - name: RAVEN_PublicServerUrl_Tcp
+          value: "tcp://b-tcp.{{.Values.domain}}:80"
+
+
   volumeClaimTemplates:
     - metadata:
         name: {{$shortname}}
@@ -199,13 +144,15 @@ spec:
       labels:
         nodeTag: "C"
     spec:
+      dnsPolicy: Default
       containers:
       - name: {{ .Chart.Name }}
-        image: ravendb/ravendb:latest
+        image: "ravendb/ravendb:{{.Values.ravenVersion}}"
         ports:
         - containerPort: 8080
           name: http
         - containerPort: 38888
+          protocol: TCP
           name: tcp
         volumeMounts:
           - name: "{{$shortname}}"
@@ -213,12 +160,20 @@ spec:
         env:
         - name: RAVEN_Setup_Mode
           value: 'NONE'
+        - name: RAVEN_ARGS
+          value: --Security.UnsecuredAccessAllowed=PublicNetwork
         - name: RAVEN_License_Eula_Accepted
           value: 'true'
+        - name: RAVEN_ServerUrl
+          value: "http://0.0.0.0:80"
+        - name: RAVEN_ServerUrl_Tcp
+          value: "tcp://0.0.0.0:38888"
         - name: RAVEN_PublicServerUrl
-          value: "http://{{$shortname}}-2:8080"
-        - name: RAVEN_PublicServerUrl.Tcp.Cluster
-          value: "tcp://{{$shortname}}-2:38888"
+          value: "http://c.{{.Values.domain}}:80"
+        - name: RAVEN_PublicServerUrl_Tcp
+          value: "tcp://c-tcp.{{.Values.domain}}:80"
+        - name: RAVEN_License
+          value: {{ .Files.Get "misc/license.json" | toPrettyJson }}
   volumeClaimTemplates:
     - metadata:
         name: {{$shortname}}
@@ -227,3 +182,27 @@ spec:
         resources:
           requests:
             storage: 5Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{$shortname}}-sidecar"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{$shortname}}
+spec:
+  volumes:
+    - name: {{$shortname}}-scripts
+      configMap:
+        name: {{$shortname}}
+  restartPolicy: OnFailure
+  containers:
+  - name: main
+    image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
+    command: ["/bin/bash"]
+    args: ["/usr/scripts/create-cluster.sh"]
+    volumeMounts:
+      - name: {{$shortname}}-scripts
+        mountPath: /usr/scripts

@@ -1,4 +1,3 @@
-{{- $paths := .Values.ingress.paths -}}
 {{- $shortname := include "ravendb.name" . -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -10,18 +9,18 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: a.localhost
+    - host: "a.{{.Values.domain}}"
       http:
         paths:
           - pathType: Prefix
             path: /
             backend:
               service: 
-                name: ravendb-0
+                name: {{ $shortname }}-0
                 port:
-                  number: 8080
+                  number: 80
             
-    - host: b.localhost
+    - host: "b.{{.Values.domain}}"
       http:
         paths:
           - pathType: Prefix
@@ -30,9 +29,9 @@ spec:
               service: 
                 name: {{ $shortname }}-1
                 port:
-                  number: 8080 
+                  number: 80
 
-    - host: c.localhost
+    - host: "c.{{.Values.domain}}"
       http:
         paths:
           - pathType: Prefix
@@ -41,5 +40,37 @@ spec:
               service: 
                 name: {{ $shortname }}-2
                 port:
-                  number: 8080 
+                  number: 80
+    - host: "a-tcp.{{.Values.domain}}"
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service: 
+                name: {{ $shortname }}-0
+                port:
+                  number: 38888
+            
+    - host: "b-tcp.{{.Values.domain}}"
+      http:
+        paths:
+          - pathType: Prefix
+            path: / 
+            backend:
+              service: 
+                name: {{ $shortname }}-1
+                port:
+                  number: 38888
+
+    - host: "c-tcp.{{.Values.domain}}"
+      http:
+        paths:
+          - pathType: Prefix
+            path: / 
+            backend:
+              service: 
+                name: {{ $shortname }}-2
+                port:
+                  number: 38888
 # todo: make dictionary and assign numbers to dns node tags {1:"a", 2:"b", 3:"c" ...}
