@@ -51,7 +51,7 @@ spec:
         - name: RAVEN_PublicServerUrl
           value: "http://a.{{.Values.domain}}:80"
         - name: RAVEN_PublicServerUrl_Tcp
-          value: "tcp://a-tcp.{{.Values.domain}}:80"
+          value: "tcp://a-tcp.{{.Values.domain}}:38887"
   volumeClaimTemplates:
     - metadata:
         name: {{$shortname}}
@@ -111,7 +111,7 @@ spec:
         - name: RAVEN_PublicServerUrl
           value: "http://b.{{.Values.domain}}:80"
         - name: RAVEN_PublicServerUrl_Tcp
-          value: "tcp://b-tcp.{{.Values.domain}}:80"
+          value: "tcp://b-tcp.{{.Values.domain}}:38888"
 
 
   volumeClaimTemplates:
@@ -171,7 +171,7 @@ spec:
         - name: RAVEN_PublicServerUrl
           value: "http://c.{{.Values.domain}}:80"
         - name: RAVEN_PublicServerUrl_Tcp
-          value: "tcp://c-tcp.{{.Values.domain}}:80"
+          value: "tcp://c-tcp.{{.Values.domain}}:38889"
         - name: RAVEN_License
           value: {{ .Files.Get "misc/license.json" | toPrettyJson }}
   volumeClaimTemplates:

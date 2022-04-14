@@ -12,3 +12,14 @@ metadata:
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
 data:
 {{ (.Files.Glob "scripts/create-cluster.sh").AsConfig | indent 2 }}
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+data:
+  38887: "default/ravendb-0:38888"
+  38888: "default/ravendb-1:38888"
+  38889: "default/ravendb-2:38888"
