@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{$shortname}}-sidecar"
+  labels:
+    heritage: {{.Release.Service | quote }}
+    release: {{.Release.Name | quote }}
+    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    app: {{$shortname}}
+spec:
+  volumes:
+    - name: {{$shortname}}-scripts
+      configMap:
+        name: {{$shortname}}
+  restartPolicy: OnFailure
+  containers:
+  - name: main
+    image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
+    command: ["/bin/bash"]
+    args: ["/usr/scripts/create-cluster.sh"]
+    volumeMounts:
+      - name: {{$shortname}}-scripts
+        mountPath: /usr/scripts

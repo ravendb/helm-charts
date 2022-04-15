@@ -1,31 +1,31 @@
 {{- $shortname := include "ravendb.name" . -}}
-{{- $fullname := include "ravendb.fullname" . -}}
 
+{{- range .Values.nodes }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: "{{$fullname}}-0"
+  name: "{{$shortname}}-{{.nodeIndex}}"
   labels:
     heritage: {{$.Release.Service | quote }}
     release: {{$.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    app: {{$shortname}}
-    nodeTag: "A"
+    chart: "{{$.Chart.Name}}-{{$.Chart.Version}}"
+    app: ravendb
+    nodeTag: "{{.nodeTag}}"
 spec:
   selector:
     matchLabels:
-      nodeTag: "A"
-  serviceName: "{{$shortname}}-0"
+      nodeTag: "{{.nodeTag}}"
+  serviceName: "{{$shortname}}-{{.nodeIndex}}"
   replicas: 1
   template:
     metadata:
       labels:
-        nodeTag: "A"
+        nodeTag: "{{.nodeTag}}"
     spec:
       dnsPolicy: Default
       containers:
-      - name: {{ .Chart.Name }}
-        image: "ravendb/ravendb:{{.Values.ravenVersion}}"
+      - name: {{ $.Chart.Name }}
+        image: "ravendb/ravendb:{{$.Values.ravenVersion}}"
         ports:
         - containerPort: 8080
           name: http
@@ -41,7 +41,7 @@ spec:
         - name: RAVEN_License_Eula_Accepted
           value: 'true'
         - name: RAVEN_License
-          value: {{ .Files.Get "misc/license.json" | toPrettyJson }}
+          value: {{ $.Files.Get "misc/license.json" | toPrettyJson }}
         - name: RAVEN_ARGS
           value: --Security.UnsecuredAccessAllowed=PublicNetwork
         - name: RAVEN_ServerUrl
@@ -49,9 +49,9 @@ spec:
         - name: RAVEN_ServerUrl_Tcp
           value: "tcp://0.0.0.0:38888"
         - name: RAVEN_PublicServerUrl
-          value: "http://a.{{.Values.domain}}:80"
+          value: "http://a.{{$.Values.domain}}:80"
         - name: RAVEN_PublicServerUrl_Tcp
-          value: "tcp://a-tcp.{{.Values.domain}}:38887"
+          value: "tcp://a-tcp.{{$.Values.domain}}:{{.publicTcpPort}}"
   volumeClaimTemplates:
     - metadata:
         name: {{$shortname}}
@@ -61,148 +61,4 @@ spec:
           requests:
             storage: 5Gi
 ---
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: "{{$fullname}}-1"
-  labels:
-    heritage: {{$.Release.Service | quote }}
-    release: {{$.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    app: {{$shortname}}
-    nodeTag: "B"
-spec:
-  selector:
-    matchLabels:
-      nodeTag: "B"
-  serviceName: "{{$shortname}}-1"
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        nodeTag: "B"
-    spec:
-      dnsPolicy: Default
-      containers:
-      - name: {{ .Chart.Name }}
-        image: "ravendb/ravendb:{{.Values.ravenVersion}}"
-        ports:
-        - containerPort: 8080
-          name: http
-        - containerPort: 38888
-          protocol: TCP
-          name: tcp
-        volumeMounts:
-          - name: "{{$shortname}}"
-            mountPath: /opt/RavenDB/Server/RavenData
-        env:
-        - name: RAVEN_Setup_Mode
-          value: 'NONE'
-        - name: RAVEN_License_Eula_Accepted
-          value: 'true'
-        - name: RAVEN_License
-          value: {{ .Files.Get "misc/license.json" | toPrettyJson }}
-        - name: RAVEN_ARGS
-          value: --Security.UnsecuredAccessAllowed=PublicNetwork
-        - name: RAVEN_ServerUrl
-          value: "http://0.0.0.0:80"
-        - name: RAVEN_ServerUrl_Tcp
-          value: "tcp://0.0.0.0:38888"
-        - name: RAVEN_PublicServerUrl
-          value: "http://b.{{.Values.domain}}:80"
-        - name: RAVEN_PublicServerUrl_Tcp
-          value: "tcp://b-tcp.{{.Values.domain}}:38888"
-
-
-  volumeClaimTemplates:
-    - metadata:
-        name: {{$shortname}}
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 5Gi
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: "{{$fullname}}-2"
-  labels:
-    heritage: {{$.Release.Service | quote }}
-    release: {{$.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    app: {{$shortname}}
-    nodeTag: "C"
-spec:
-  selector:
-    matchLabels:
-      nodeTag: "C"
-  serviceName: "{{$shortname}}-2"
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        nodeTag: "C"
-    spec:
-      dnsPolicy: Default
-      containers:
-      - name: {{ .Chart.Name }}
-        image: "ravendb/ravendb:{{.Values.ravenVersion}}"
-        ports:
-        - containerPort: 8080
-          name: http
-        - containerPort: 38888
-          protocol: TCP
-          name: tcp
-        volumeMounts:
-          - name: "{{$shortname}}"
-            mountPath: /opt/RavenDB/Server/RavenData
-        env:
-        - name: RAVEN_Setup_Mode
-          value: 'NONE'
-        - name: RAVEN_ARGS
-          value: --Security.UnsecuredAccessAllowed=PublicNetwork
-        - name: RAVEN_License_Eula_Accepted
-          value: 'true'
-        - name: RAVEN_ServerUrl
-          value: "http://0.0.0.0:80"
-        - name: RAVEN_ServerUrl_Tcp
-          value: "tcp://0.0.0.0:38888"
-        - name: RAVEN_PublicServerUrl
-          value: "http://c.{{.Values.domain}}:80"
-        - name: RAVEN_PublicServerUrl_Tcp
-          value: "tcp://c-tcp.{{.Values.domain}}:38889"
-        - name: RAVEN_License
-          value: {{ .Files.Get "misc/license.json" | toPrettyJson }}
-  volumeClaimTemplates:
-    - metadata:
-        name: {{$shortname}}
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 5Gi
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: "{{$shortname}}-sidecar"
-  labels:
-    heritage: {{.Release.Service | quote }}
-    release: {{.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    app: {{$shortname}}
-spec:
-  volumes:
-    - name: {{$shortname}}-scripts
-      configMap:
-        name: {{$shortname}}
-  restartPolicy: OnFailure
-  containers:
-  - name: main
-    image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
-    command: ["/bin/bash"]
-    args: ["/usr/scripts/create-cluster.sh"]
-    volumeMounts:
-      - name: {{$shortname}}-scripts
-        mountPath: /usr/scripts
+{{- end }}

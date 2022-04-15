@@ -1,26 +1,10 @@
 {{- $shortname := include "ravendb.name" . -}}
 
-# {{- range .Values.nodesTags }}
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: "{{$shortname}}-{{.}}"
-#   labels:
-#     app: "{{$shortname}}"
-# spec:
-#   ports:
-#   - port: 8080
-#     name: http
-#   - port: 38888
-#     name: tcp
-#   selector:
-#     nodeTag: "{{.}}"
-# {{- end }}
-
+{{- range .Values.nodes }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: ravendb-0
+  name: "ravendb-{{.nodeIndex}}"
   labels:
     app: ravendb
 spec:
@@ -31,36 +15,6 @@ spec:
     protocol: TCP
     name: tcp
   selector:
-    nodeTag: "A"
+    nodeTag: {{.nodeTag}}
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: ravendb-1
-  labels:
-    app: ravendb
-spec:
-  ports:
-  - port: 80
-    name: http
-  - port: 38888
-    name: tcp
-    protocol: TCP
-  selector:
-    nodeTag: "B"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ravendb-2
-  labels:
-    app: ravendb
-spec:
-  ports:
-  - port: 80
-    name: http
-  - port: 38888
-    protocol: TCP
-    name: tcp
-  selector:
-    nodeTag: "C"
+{{- end }}

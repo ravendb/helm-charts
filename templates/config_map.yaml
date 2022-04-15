@@ -1,5 +1,4 @@
 {{- $shortname := include "ravendb.name" . -}}
-{{- $fullname := include "ravendb.fullname" . -}}
 
 kind: ConfigMap
 apiVersion: v1
@@ -20,6 +19,6 @@ metadata:
   name: tcp-services
   namespace: ingress-nginx
 data:
-  38887: "default/ravendb-0:38888"
-  38888: "default/ravendb-1:38888"
-  38889: "default/ravendb-2:38888"
+  {{- range .Values.nodes }}
+  {{.publicTcpPort}}: "default/ravendb-{{.nodeIndex}}:38888"
+  {{- end }}

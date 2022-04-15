@@ -8,12 +8,27 @@ licenseFileName: misc/license.json
 persistence:
   storage: 2G
 
-# Instances
+
+# Important note on NGINX
+# Using nginx as ingress-controller is only possible with '--tcp-services-configmap=ingress-nginx/tcp-services' arg due to issues with exposing tcp service on ingress
+# Nginx k8s dependencies are frequently deployed in the 'ingress-nginx' namespace, and you can deploy nginx using file located in the misc folder
+# It is highly recommended to do so, run `kubectl apply -f nginx-ingress-controller-for-ravendb` when testing locally
+# It is not necessary, but running `kubectl delete all --all -n ingress-nginx` should delete all nginx k8s depts
+# Then you can run `kubectl apply -f nginx-ingress-controller-for-ravendb` to either update or install well configured nginx ingress controller locally
+
+# Manual configuration of k8s nginx:
+# - Make sure that services that route to nginx pod expose also public tcp ports of RavenDB nodes like 38887, 38888 and 38889 
+# - Make sure that port 38888 (or your own ServerUrl_Tcp port) is available on nginx controller pod 
+
+# RavenDB nodes
 nodes:
-- nodeTag: "A"
-  nodeIndex: 0
-- nodeTag: "B"
-  nodeIndex: 1
-- nodeTag: "C"
-  nodeIndex: 2
+  - nodeTag: "A"
+    nodeIndex: 0
+    publicTcpPort: 38887
+  - nodeTag: "B"
+    nodeIndex: 1
+    publicTcpPort: 38888
+  - nodeTag: "C"
+    nodeIndex: 2
+    publicTcpPort: 38889
   
