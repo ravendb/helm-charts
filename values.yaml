@@ -1,6 +1,3 @@
-ingress:
-  host: [ localhost ]
-
 domain: "poisson.development.run"
 ravenVersion: latest
 licenseFileName: misc/license.json
@@ -10,15 +7,15 @@ persistence:
 
 
 # Important note on NGINX
-# Using nginx as ingress-controller is only possible with '--tcp-services-configmap=ingress-nginx/tcp-services' arg due to issues with exposing tcp service on ingress
-# Nginx k8s dependencies are frequently deployed in the 'ingress-nginx' namespace, and you can deploy nginx using file located in the misc folder
-# It is highly recommended to do so, run `kubectl apply -f nginx-ingress-controller-for-ravendb` when testing locally
+# You need to use nginx with additional '--tcp-services-configmap=ingress-nginx/tcp-services' arg due to issues with exposing tcp service on ingress
+# If you've installed k8s nginx before, its dependencies are frequently deployed in the 'ingress-nginx' namespace 
+# You can deploy nginx to k8s using file located in the misc folder, it is preconfigured for default values
 # It is not necessary, but running `kubectl delete all --all -n ingress-nginx` should delete all nginx k8s depts
-# Then you can run `kubectl apply -f nginx-ingress-controller-for-ravendb` to either update or install well configured nginx ingress controller locally
+# Then you can run `kubectl apply -f [path to 'nginx-ingress-controller-for-ravendb' file]` to either update or install well configured nginx ingress controller locally
 
 # Manual configuration of k8s nginx:
 # - Make sure that services that route to nginx pod expose also public tcp ports of RavenDB nodes like 38887, 38888 and 38889 
-# - Make sure that port 38888 (or your own ServerUrl_Tcp port) is available on nginx controller pod 
+# - Make sure that port 38888 (or your own ServerUrl_Tcp port) is exposed from nginx controller pod 
 
 # RavenDB nodes
 nodes:

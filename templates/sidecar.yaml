@@ -1,3 +1,5 @@
+{{- $shortname := include "ravendb.name" . -}}
+
 apiVersion: v1
 kind: Pod
 metadata:
