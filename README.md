@@ -4,16 +4,16 @@
 
 `helm install [name] [chart path]`
 
-e.g.
 
-`helm install ravendb .`
+![](.github/helm_install.gif)
 
+---
 
 ## Local testing
 Make sure you have properly configured nginx ingress controller.
 Read/follow the steps from the nginx dedicated note inside `values.yaml` file.
 
-You might need to make sure that your DNS is correctly configured, pods need records that translate `\<nodeTag>{-tcp}.[domain]` names to ingress controller IP address.
+You might need to make sure that your DNS is correctly configured, pods need records that translate `<nodeTag>{-tcp}.[domain]` names to ingress controller IP address.
 
 e.g. Additional record inside /etc/hosts file, `192.168.1.15` is my local IP address, running nginx on local machine k8s cluster
 
