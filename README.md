@@ -5,6 +5,9 @@
 `helm install [name] [chart path]`
 
 
+Before installation you need to specify your RavenDB license file path inside `values.yaml`, or copy the license json to the  `misc/license.json` file.
+
+
 ![](.github/helm_install.gif)
 
 ---
