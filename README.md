@@ -1,3 +1,5 @@
+Work in progress, use only for testing.
+
 # Official Helm chart for RavenDB NoSQL Database  ☸️
 
 ## Installation
