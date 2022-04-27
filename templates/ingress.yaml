@@ -23,7 +23,7 @@ spec:
             path: /
             backend:
               service: 
-                name: {{ $shortname }}-{{.nodeIndex}}
+                name: {{ $shortname }}-{{.nodeTag | lower}}
                 port:
                   number: 443
 
@@ -34,7 +34,7 @@ spec:
             path: /
             backend:
               service: 
-                name: {{ $shortname }}-{{.nodeIndex}}
+                name: {{ $shortname }}-{{.nodeTag | lower }}
                 port:
                   number: 38888
     {{- end }}

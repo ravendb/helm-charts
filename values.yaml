@@ -7,12 +7,9 @@ storageSize: 5Gi
 # RavenDB nodes
 nodes:
   - nodeTag: "A"
-    nodeIndex: 0
     publicTcpPort: 38887
   - nodeTag: "B"
-    nodeIndex: 1
     publicTcpPort: 38888
   - nodeTag: "C"
-    nodeIndex: 2
     publicTcpPort: 38889
   

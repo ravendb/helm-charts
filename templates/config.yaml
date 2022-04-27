@@ -21,7 +21,7 @@ metadata:
   namespace: ingress-nginx
 data:
   {{- range .Values.nodes }}
-  {{.publicTcpPort}}: "default/ravendb-{{.nodeIndex}}:38888"
+  {{.publicTcpPort}}: "default/ravendb-{{.nodeTag}}:38888"
   {{- end }}
 ---
 

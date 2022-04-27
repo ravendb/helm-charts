@@ -4,7 +4,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: "{{$shortname}}-{{.nodeIndex}}"
+  name: "{{$shortname}}-{{.nodeTag | lower }}"
   annotations: 
     ingress.kubernetes.io/ssl-passthrough: "true"
   labels:
@@ -17,7 +17,7 @@ spec:
   selector:
     matchLabels:
       nodeTag: "{{.nodeTag}}"
-  serviceName: "{{$shortname}}-{{.nodeIndex}}"
+  serviceName: "{{$shortname}}-{{.nodeTag | lower }}"
   replicas: 1
   template:
     metadata:
