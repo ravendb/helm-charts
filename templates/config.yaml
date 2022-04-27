@@ -11,6 +11,7 @@ metadata:
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
 data:
 {{ (.Files.Glob "scripts/create-cluster.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "scripts/get-server-cert.sh").AsConfig | indent 2 }}
 
 ---
 kind: ConfigMap
@@ -22,3 +23,12 @@ data:
   {{- range .Values.nodes }}
   {{.publicTcpPort}}: "default/ravendb-{{.nodeIndex}}:38888"
   {{- end }}
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{$shortname}}-pack
+type: Opaque
+data:
+{{ (.Files.Glob .Values.packageFilePath).AsSecrets | indent 2 }}

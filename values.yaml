@@ -1,20 +1,8 @@
 domain: "poisson.development.run"
 ravenVersion: latest
-licenseFileName: misc/license.json
-
-persistence:
-  storage: 2G
-
-
-# Important note on NGINX
-# You need to use nginx with additional '--tcp-services-configmap=ingress-nginx/tcp-services' arg due to issues with exposing tcp service on ingress
-# If you've installed k8s nginx before, its dependencies are frequently deployed in the 'ingress-nginx' namespace 
-# You can deploy nginx to k8s using file located in the misc folder, it is preconfigured for default values
-# It is not necessary, but running `kubectl delete all --all -n ingress-nginx` should delete all nginx k8s depts
-# Then you can run `kubectl apply -f [path to 'nginx-ingress-controller-for-ravendb' file]` to either update or install well configured nginx ingress controller locally
-# Manual configuration of k8s nginx:
-# - Make sure that services that route to nginx pod expose also public tcp ports of RavenDB nodes like 38887, 38888 and 38889 
-# - Make sure that port 38888 (or your own ServerUrl_Tcp port) is exposed from nginx controller pod 
+licenseFilePath: misc/license.json
+packageFilePath: misc/pack.zip
+storageSize: 5Gi
 
 # RavenDB nodes
 nodes:

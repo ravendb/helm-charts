@@ -9,8 +9,8 @@ metadata:
     app: ravendb
 spec:
   ports:
-  - port: 80
-    name: http
+  - port: 443
+    name: https
   - port: 38888
     protocol: TCP
     name: tcp

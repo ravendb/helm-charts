@@ -1,8 +1,23 @@
-#!bin/bash
+#!/bin/bash
 apt-get update
 apt-get install curl -y
-uriB='http://a.poisson.development.run/admin/cluster/node?url=http%3A%2F%2Fb.poisson.development.run&watcher=false&tag=B' 
-uriC='http://a.poisson.development.run/admin/cluster/node?url=http%3A%2F%2Fc.poisson.development.run&watcher=false&tag=C' 
-sleep 10 # wait for nodes to stand-up
-curl -L -X PUT $uriB -d ''
-curl -L -X PUT $uriC -d ''
+apt-get install unzip -y
+mkdir /usr/ravendb-pack 
+cp /usr/ravendb/pack.zip /usr/ravendb-pack/pack.zip
+
+cd /usr/ravendb-pack || exit
+unzip -qq pack.zip
+cd A || exit
+
+domain_name=$( tail -2 settings.json | head -1 | cut -f 3 -d : | cut -c 5-)
+openssl pkcs12 -in "$(find ./*certificate*)" -password pass: -out cert.pem -nodes -legacy
+
+# todo: get nodes tags from .Values
+# todo: validate that domain name from .Values is identical to the package domain name 
+
+uriB='https://a.'$domain_name'/admin/cluster/node?url=https%3A%2F%2Fb.'$domain_name'&watcher=false&tag=B'
+uriC='https://a.'$domain_name'/admin/cluster/node?url=https%3A%2F%2Fc.'$domain_name'&watcher=false&tag=C'
+
+sleep 60 # wait for nodes to stand-up
+curl -L -X PUT "$uriB" --cert cert.pem
+curl -L -X PUT "$uriC" --cert cert.pem

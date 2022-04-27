@@ -459,6 +459,7 @@ spec:
         - --ingress-class=nginx
         - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller
         - '--tcp-services-configmap=ingress-nginx/tcp-services'
+        - --enable-ssl-passthrough
         - --validating-webhook=:8443
         - --validating-webhook-certificate=/usr/local/certificates/cert
         - --validating-webhook-key=/usr/local/certificates/key

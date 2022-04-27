@@ -10,11 +10,14 @@ metadata:
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
     app: {{$shortname}}
 spec:
+  restartPolicy: OnFailure
   volumes:
     - name: {{$shortname}}-scripts
       configMap:
         name: {{$shortname}}
-  restartPolicy: OnFailure
+    - name: {{$shortname}}-pack
+      secret:
+        secretName: {{$shortname}}-pack
   containers:
   - name: main
     image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
@@ -23,3 +26,5 @@ spec:
     volumeMounts:
       - name: {{$shortname}}-scripts
         mountPath: /usr/scripts
+      - name: {{$shortname}}-pack
+        mountPath: /usr/ravendb
