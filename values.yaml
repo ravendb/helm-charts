@@ -3,6 +3,7 @@ ravenVersion: latest
 licenseFilePath: misc/license.json
 packageFilePath: misc/pack.zip
 storageSize: 5Gi
+ingressClassName: nginx
 
 # RavenDB nodes
 nodes:

@@ -10,6 +10,12 @@ unzip -qq pack.zip
 cd A || exit
 
 domain_name=$( tail -2 settings.json | head -1 | cut -f 3 -d : | cut -c 5-)
+domain_name_values="$(cat /usr/scripts/domain)"
+if [ "$domain_name" != "$domain_name_values" ]; then
+    echo "Domain name from values.yaml doesn't match domain name from the .zip package"
+    exit
+fi
+
 openssl pkcs12 -in "$(find ./*certificate*)" -password pass: -out cert.pem -nodes -legacy
 
 # todo: get nodes tags from .Values

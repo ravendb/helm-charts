@@ -12,6 +12,7 @@ metadata:
 data:
 {{ (.Files.Glob "scripts/create-cluster.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/get-server-cert.sh").AsConfig | indent 2 }}
+  domain: {{.Values.domain}}
 
 ---
 kind: ConfigMap
