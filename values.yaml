@@ -1,5 +1,5 @@
 domain: "poisson.development.run"
-ravenVersion: latest
+ravenImageTag: latest
 licenseFilePath: misc/license.json
 packageFilePath: misc/pack.zip
 storageSize: 5Gi

@@ -27,7 +27,7 @@ spec:
       dnsPolicy: Default
       containers:
       - name: {{ $.Chart.Name }}
-        image: "ravendb/ravendb:{{$.Values.ravenVersion}}"
+        image: "ravendb/ravendb:{{$.Values.ravenImageTag}}"
         ports:
         - containerPort: 443
           name: https
