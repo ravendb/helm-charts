@@ -1,0 +1,33 @@
+{{- $shortname := include "ravendb.name" . -}}
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: modify-secrets
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources:
+      - secrets
+    verbs:
+      - get
+      - patch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: modify-secrets
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: modify-secrets
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: modify-secrets
+    namespace: default
+roleRef:
+  kind: Role
+  name: modify-secrets
+  apiGroup: rbac.authorization.k8s.io

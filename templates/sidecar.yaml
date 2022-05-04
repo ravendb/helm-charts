@@ -14,7 +14,7 @@ spec:
   volumes:
     - name: {{$shortname}}-scripts
       configMap:
-        name: {{$shortname}}
+        name: {{$shortname}}-scripts
     - name: {{$shortname}}-pack
       secret:
         secretName: {{$shortname}}-pack

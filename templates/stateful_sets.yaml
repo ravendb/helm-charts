@@ -25,6 +25,20 @@ spec:
         nodeTag: "{{.nodeTag}}"
     spec:
       dnsPolicy: Default
+      serviceAccountName: modify-secrets
+      initContainers:
+      - name: "{{$.Chart.Name}}-init"
+        image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
+        command: ["/bin/bash"]
+        args: ["/usr/scripts/set-cert.sh"]
+        volumeMounts:
+          - name: {{$shortname}}-scripts
+            mountPath: /usr/scripts
+          - name: {{$shortname}}-pack
+            mountPath: /usr/ravendb
+          - name: {{$shortname}}-certs
+            mountPath: /usr/ravendb-certs
+            readOnly: false
       containers:
       - name: {{ $.Chart.Name }}
         image: "ravendb/ravendb:{{$.Values.ravenImageTag}}"
@@ -34,9 +48,6 @@ spec:
         - containerPort: 38888
           name: tcp
           protocol: TCP
-        volumeMounts:
-          - name: "{{$shortname}}"
-            mountPath: /opt/RavenDB/Server/RavenData
         env:
         - name: RAVEN_Setup_Mode
           value: 'NONE'
@@ -59,14 +70,21 @@ spec:
             mountPath: /usr/scripts
           - name: {{$shortname}}-pack
             mountPath: /usr/ravendb
+          - name: {{$shortname}}-certs
+            mountPath: /usr/ravendb-certs
+          - name: "{{$shortname}}"
+            mountPath: /opt/RavenDB/Server/RavenData
       volumes:
         - name: {{$shortname}}-scripts
           configMap:
-            name: {{$shortname}}
+            name: {{$shortname}}-scripts
             defaultMode: 0700
         - name: {{$shortname}}-pack
           secret:
             secretName: {{$shortname}}-pack
+        - name: {{$shortname}}-certs
+          secret:
+            secretName: {{$shortname}}-certs
   volumeClaimTemplates:
     - metadata:
         name: {{$shortname}}
