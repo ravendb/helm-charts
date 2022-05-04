@@ -3,7 +3,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{$shortname}}
+  name: {{$shortname}}-scripts
   labels:
     app: {{$shortname}}
     heritage: {{$.Release.Service | quote }}
@@ -12,6 +12,7 @@ metadata:
 data:
 {{ (.Files.Glob "scripts/create-cluster.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/get-server-cert.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "scripts/set-cert.sh").AsConfig | indent 2 }}
   domain: {{.Values.domain}}
 
 ---
@@ -33,3 +34,13 @@ metadata:
 type: Opaque
 data:
 {{ (.Files.Glob .Values.packageFilePath).AsSecrets | indent 2 }}
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{$shortname}}-certs
+type: Opaque
+data:
+  cert.pfx: {{ "no-cert" | b64enc}}
