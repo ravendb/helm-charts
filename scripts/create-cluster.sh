@@ -24,6 +24,6 @@ openssl pkcs12 -in "$(find ./*certificate*)" -password pass: -out cert.pem -node
 uriB='https://a.'$domain_name'/admin/cluster/node?url=https%3A%2F%2Fb.'$domain_name'&watcher=false&tag=B'
 uriC='https://a.'$domain_name'/admin/cluster/node?url=https%3A%2F%2Fc.'$domain_name'&watcher=false&tag=C'
 
-sleep 60 # wait for nodes to stand-up
+sleep 75 # wait for nodes to stand-up
 curl -L -X PUT "$uriB" --cert cert.pem
 curl -L -X PUT "$uriC" --cert cert.pem
