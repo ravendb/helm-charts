@@ -1,4 +1,4 @@
-email: yourname@example.net
+letsEncryptEmail: yourname@example.net
 domain: "poisson.development.run"
 ravenImageTag: latest
 licenseFilePath: misc/license.json
@@ -14,4 +14,3 @@ nodes:
     publicTcpPort: 38888
   - nodeTag: "C"
     publicTcpPort: 38889
-  

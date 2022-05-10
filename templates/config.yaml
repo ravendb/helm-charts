@@ -45,6 +45,6 @@ metadata:
   name: {{$shortname}}-certs
 type: Opaque
 data:
-  a.pfx: {{ "no-cert" | b64enc}}
-  b.pfx: {{ "no-cert" | b64enc}} # todo: loop
-  c.pfx: {{ "no-cert" | b64enc}}
+  {{- range .Values.nodes }}
+  {{.nodeTag | lower}}.pfx: {{ "no-cert" | b64enc}}
+  {{- end }}

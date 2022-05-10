@@ -30,14 +30,14 @@ spec:
       - name: "{{$.Chart.Name}}-init"
         image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
         command: ["/bin/bash"]
-        args: ["/usr/scripts/set-cert.sh"]
+        args: ["/ravendb/scripts/set-cert.sh"]
         volumeMounts:
           - name: {{$shortname}}-scripts
-            mountPath: /usr/scripts
+            mountPath: /ravendb/scripts
           - name: {{$shortname}}-pack
             mountPath: /usr/ravendb
           - name: {{$shortname}}-certs
-            mountPath: /usr/ravendb-certs
+            mountPath: /ravendb/certs
             readOnly: false
       containers:
       - name: {{ $.Chart.Name }}
@@ -54,13 +54,13 @@ spec:
         - name: RAVEN_License
           value: {{ $.Files.Get $.Values.licenseFilePath | toPrettyJson }}
         - name: RAVEN_Security_Certificate_LetsEncrypt_Email
-          value: {{$.Values.email}}
+          value: {{$.Values.letsEncryptEmail}}
         - name: RAVEN_Setup_Mode
           value: "LetsEncrypt"
         # - name: RAVEN_AcmeUrl
         #   value: "https://acme-staging-v02.api.letsencrypt.org/directory"
         - name: RAVEN_ARGS
-          value: --Security.UnsecuredAccessAllowed=PublicNetwork --Security.Certificate.Load.Exec=/usr/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/usr/scripts/update-cert.sh --Security.Certificate.Renew.Exec=/usr/cripts/renew-cert.sh
+          value: --Security.UnsecuredAccessAllowed=PublicNetwork --Security.Certificate.Load.Exec=/ravendb/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/ravendb/scripts/update-cert.sh --Security.Certificate.Renew.Exec=/ravendb/scripts/renew-cert.sh
         - name: RAVEN_ServerUrl
           value: "https://0.0.0.0:443"
         - name: RAVEN_ServerUrl_Tcp
@@ -71,11 +71,11 @@ spec:
           value: "tcp://{{ .nodeTag | lower }}-tcp.{{$.Values.domain}}:{{.publicTcpPort}}"
         volumeMounts:
           - name: {{$shortname}}-scripts
-            mountPath: /usr/scripts
+            mountPath: /ravendb/scripts
           - name: {{$shortname}}-pack
             mountPath: /usr/ravendb
           - name: {{$shortname}}-certs
-            mountPath: /usr/ravendb-certs
+            mountPath: /ravendb/certs
           - name: "{{$shortname}}"
             mountPath: /opt/RavenDB/Server/RavenData
       volumes:

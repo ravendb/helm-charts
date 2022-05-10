@@ -22,9 +22,9 @@ spec:
   - name: main
     image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
     command: ["/bin/bash"]
-    args: ["/usr/scripts/create-cluster.sh"]
+    args: ["/ravendb/scripts/create-cluster.sh"]
     volumeMounts:
       - name: {{$shortname}}-scripts
-        mountPath: /usr/scripts
+        mountPath: /ravendb/scripts
       - name: {{$shortname}}-pack
         mountPath: /usr/ravendb

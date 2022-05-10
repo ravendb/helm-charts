@@ -26,12 +26,12 @@ function update_secret {
     node_tag="$(env | grep HOSTNAME | cut -f 2 -d '-')"
     echo "Node tag: $node_tag"
     
-    previous_content=$(cat /usr/ravendb-certs/"$node_tag".pfx)
+    previous_content=$(cat /ravendb/certs/"$node_tag".pfx)
     # update secret
     echo "Updating sever certificate on node $node_tag by updating ravendb-certs secret"
     kubectl get secret ravendb-certs -o json | jq ".data[\"$node_tag.pfx\"]=\"$new_cert\"" | kubectl apply -f -
 
-    content=$(cat /usr/ravendb-certs/"$node_tag".pfx)
+    content=$(cat /ravendb/certs/"$node_tag".pfx)
 
     if [[ $previous_content == "$content" ]]; then
         echo "ERROR: The updated certificate (mounted secret path) is identical to the previous one..."
@@ -40,5 +40,3 @@ function update_secret {
 }
 
 update_secret >> /var/log/cert-update-logs
-
-

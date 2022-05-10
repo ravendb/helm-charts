@@ -4,5 +4,5 @@
 node_tag="$(env | grep HOSTNAME | cut -f 2 -d '-')"
 
 # print .pfx
-cat -u /usr/ravendb-certs/"$node_tag".pfx
+cat -u /ravendb/certs/"$node_tag".pfx
 exit
