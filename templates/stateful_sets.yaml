@@ -49,14 +49,18 @@ spec:
           name: tcp
           protocol: TCP
         env:
-        - name: RAVEN_Setup_Mode
-          value: 'NONE'
         - name: RAVEN_License_Eula_Accepted
           value: 'true'
         - name: RAVEN_License
           value: {{ $.Files.Get $.Values.licenseFilePath | toPrettyJson }}
+        - name: RAVEN_Security_Certificate_LetsEncrypt_Email
+          value: {{$.Values.email}}
+        - name: RAVEN_Setup_Mode
+          value: "LetsEncrypt"
+        # - name: RAVEN_AcmeUrl
+        #   value: "https://acme-staging-v02.api.letsencrypt.org/directory"
         - name: RAVEN_ARGS
-          value: --Security.UnsecuredAccessAllowed=PublicNetwork --Security.Certificate.Load.Exec=/usr/scripts/get-server-cert.sh --Security.Certificate.Load.Exec.Arguments=/usr/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60
+          value: --Security.UnsecuredAccessAllowed=PublicNetwork --Security.Certificate.Load.Exec=/usr/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/usr/scripts/update-cert.sh --Security.Certificate.Renew.Exec=/usr/cripts/renew-cert.sh
         - name: RAVEN_ServerUrl
           value: "https://0.0.0.0:443"
         - name: RAVEN_ServerUrl_Tcp

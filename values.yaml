@@ -1,3 +1,4 @@
+email: yourname@example.net
 domain: "poisson.development.run"
 ravenImageTag: latest
 licenseFilePath: misc/license.json

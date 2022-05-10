@@ -2,10 +2,7 @@
 
 # install depts
 apt-get update -qq
-apt-get install unzip -qq
-apt-get install curl -qq
-apt-get install sudo -qq
-apt-get install jq -qq
+apt-get install unzip curl sudo jq -qq
 
 # install kubectl
 cd /usr || exit
@@ -21,7 +18,10 @@ cd /usr/ravendb-pack || exit
 
 # unzip the pack
 unzip -qq pack.zip > /dev/null
-cd A || exit
+
+node_tag="$(env | grep HOSTNAME | cut -f 2 -d '-')"
+
+cd "${node_tag^^}" || exit
 
 # update secret
-kubectl get secret ravendb-certs -o json | jq ".data[\"cert.pfx\"]=\"$(cat ./*certificate* | base64)\"" | kubectl apply -f -
+kubectl get secret ravendb-certs -o json | jq ".data[\"$node_tag.pfx\"]=\"$(cat ./*certificate* | base64)\"" | kubectl apply -f -

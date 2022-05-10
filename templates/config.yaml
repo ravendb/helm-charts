@@ -12,6 +12,8 @@ metadata:
 data:
 {{ (.Files.Glob "scripts/create-cluster.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/get-server-cert.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "scripts/update-cert.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "scripts/renew-cert.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/set-cert.sh").AsConfig | indent 2 }}
   domain: {{.Values.domain}}
 
@@ -43,4 +45,6 @@ metadata:
   name: {{$shortname}}-certs
 type: Opaque
 data:
-  cert.pfx: {{ "no-cert" | b64enc}}
+  a.pfx: {{ "no-cert" | b64enc}}
+  b.pfx: {{ "no-cert" | b64enc}} # todo: loop
+  c.pfx: {{ "no-cert" | b64enc}}
