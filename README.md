@@ -1,6 +1,9 @@
-Work in progress.
-
 # Official Helm chart for RavenDB NoSQL Database  ☸️
+
+## Overview
+This Helm chart provides all necessary components for the secured RavenDB cluster. It's very easy to deploy & manage your own RavenDB cluster by using it.
+
+---
 
 ## Installation
 
@@ -8,9 +11,10 @@ Work in progress.
 
 
 Before installation you need to specify your RavenDB license file path inside `values.yaml`, or copy the license json to the  `misc/license.json` file.
-Also, provide your domain name and path to RavenDB certificates & license package (e.g. from `rvn create-package` tool).
-Optionally, provide a version of RavenDB (latest by default).
+Also, provide your domain name, Let's Encrypt email, and path to RavenDB certificates & license package (e.g. from `rvn create-package` tool).
 
+Optionally, you can provide a custom version of RavenDB (latest by default) or a node storage size.
+ 
 
 ![](.github/helm_install.gif)
 
@@ -71,3 +75,12 @@ Traefik is a bit complex
 Also, remember to enable SSL passtrough on your ingress controller
 https://doc.traefik.io/traefik/routing/routers/#passthrough
 https://serversforhackers.com/c/using-ssl-certificates-with-haproxy
+
+----
+
+## Rolling updates
+You can perform rolling update using the `rolling-update.sh` script located in the `/scripts` directory. Provide desired RavenDB image tag from the DockerHub https://hub.docker.com/r/ravendb/ravendb/tags as the first arg and path to the Helm chart as the second.
+
+`./rolling-update.sh latest ~/ravendb-chart/`
+
+It'll execute rolling update strategy and update your pods image tags.
