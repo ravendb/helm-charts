@@ -1,10 +1,8 @@
-{{- $shortname := include "ravendb.name" . -}}
-
 {{- range .Values.nodes }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: "{{$shortname}}-{{.nodeTag | lower }}"
+  name: "ravendb-{{.nodeTag | lower }}"
   annotations: 
     ingress.kubernetes.io/ssl-passthrough: "true"
   labels:
@@ -17,7 +15,7 @@ spec:
   selector:
     matchLabels:
       nodeTag: "{{.nodeTag}}"
-  serviceName: "{{$shortname}}-{{.nodeTag | lower }}"
+  serviceName: "ravendb-{{.nodeTag | lower }}"
   replicas: 1
   template:
     metadata:
@@ -32,15 +30,15 @@ spec:
         command: ["/bin/bash"]
         args: ["/ravendb/scripts/set-cert.sh"]
         volumeMounts:
-          - name: {{$shortname}}-scripts
+          - name: ravendb-scripts
             mountPath: /ravendb/scripts
-          - name: {{$shortname}}-pack
+          - name: ravendb-pack
             mountPath: /usr/ravendb
-          - name: {{$shortname}}-certs
+          - name: ravendb-certs
             mountPath: /ravendb/certs
             readOnly: false
       containers:
-      - name: {{ $.Chart.Name }}
+      - name: ravendb-container
         image: "ravendb/ravendb:{{$.Values.ravenImageTag}}"
         ports:
         - containerPort: 443
@@ -69,29 +67,33 @@ spec:
           value: "https://{{ .nodeTag | lower }}.{{$.Values.domain}}:443"
         - name: RAVEN_PublicServerUrl_Tcp
           value: "tcp://{{ .nodeTag | lower }}-tcp.{{$.Values.domain}}:{{.publicTcpPort}}"
+        {{- range $key, $val := $.Values.environment }}
+        - name: {{ $key }}
+          value: {{ $val }}
+        {{ end -}}
         volumeMounts:
-          - name: {{$shortname}}-scripts
+          - name: ravendb-scripts
             mountPath: /ravendb/scripts
-          - name: {{$shortname}}-pack
+          - name: ravendb-pack
             mountPath: /usr/ravendb
-          - name: {{$shortname}}-certs
+          - name: ravendb-certs
             mountPath: /ravendb/certs
-          - name: "{{$shortname}}"
+          - name: "ravendb"
             mountPath: /opt/RavenDB/Server/RavenData
       volumes:
-        - name: {{$shortname}}-scripts
+        - name: ravendb-scripts
           configMap:
-            name: {{$shortname}}-scripts
+            name: ravendb-scripts
             defaultMode: 0700
-        - name: {{$shortname}}-pack
+        - name: ravendb-pack
           secret:
-            secretName: {{$shortname}}-pack
-        - name: {{$shortname}}-certs
+            secretName: ravendb-pack
+        - name: ravendb-certs
           secret:
-            secretName: {{$shortname}}-certs
+            secretName: ravendb-certs
   volumeClaimTemplates:
     - metadata:
-        name: {{$shortname}}
+        name: ravendb
       spec:
         accessModes: ["ReadWriteOnce"]
         resources:

@@ -35,8 +35,24 @@ openssl pkcs12 -in "$(find ./*certificate*)" -password pass: -out cert.pem -node
 # send requests that will create cluster using converted certificate 
 uriB='https://a.'$domain_name'/admin/cluster/node?url=https%3A%2F%2Fb.'$domain_name'&watcher=false&tag=B'
 uriC='https://a.'$domain_name'/admin/cluster/node?url=https%3A%2F%2Fc.'$domain_name'&watcher=false&tag=C'
-echo "Waiting for nodes to stand up..."
-sleep 75 # wait for nodes to stand up
-echo "Sending request..."
+echo "Waiting for nodes to stand up..." 
+while ! curl "https://a.$domain_name/setup/alive"
+do
+    echo -n "."
+    sleep 3
+done
+while ! curl "https://b.$domain_name/setup/alive"
+do
+    echo -n "."
+    sleep 3
+done
+while ! curl "https://c.$domain_name/setup/alive"
+do
+    echo -n "."
+    sleep 3
+done
+
+echo
+echo "Sending requests..."
 curl -L -X PUT "$uriB" --cert cert.pem
 curl -L -X PUT "$uriC" --cert cert.pem

@@ -1,11 +1,9 @@
-{{- $shortname := include "ravendb.name" . -}}
-
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ $shortname }} 
+  name: ravendb 
   labels:
-    app.kubernetes.io/name: {{ include "ravendb.name" . }}
+    app.kubernetes.io/name: ravendb
     app.kubernetes.io/instance: {{ .Release.Name }}
   annotations:
     ingress.kubernetes.io/backend-protocol: HTTPS
@@ -23,7 +21,7 @@ spec:
             path: /
             backend:
               service: 
-                name: {{ $shortname }}-{{.nodeTag | lower}}
+                name: ravendb-{{.nodeTag | lower}}
                 port:
                   number: 443
 
@@ -34,7 +32,7 @@ spec:
             path: /
             backend:
               service: 
-                name: {{ $shortname }}-{{.nodeTag | lower }}
+                name: ravendb-{{.nodeTag | lower }}
                 port:
                   number: 38888
     {{- end }}

@@ -1,5 +1,3 @@
-{{- $shortname := include "ravendb.name" . -}}
-
 {{- range .Values.nodes }}
 apiVersion: v1
 kind: Service

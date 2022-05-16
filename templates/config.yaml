@@ -1,11 +1,9 @@
-{{- $shortname := include "ravendb.name" . -}}
-
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{$shortname}}-scripts
+  name: ravendb-scripts
   labels:
-    app: {{$shortname}}
+    app: ravendb
     heritage: {{$.Release.Service | quote }}
     release: {{$.Release.Name | quote }}
     chart: "{{.Chart.Name}}-{{.Chart.Version}}"
@@ -32,7 +30,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{$shortname}}-pack
+  name: ravendb-pack
 type: Opaque
 data:
 {{ (.Files.Glob .Values.packageFilePath).AsSecrets | indent 2 }}
@@ -42,7 +40,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{$shortname}}-certs
+  name: ravendb-certs
 type: Opaque
 data:
   {{- range .Values.nodes }}
