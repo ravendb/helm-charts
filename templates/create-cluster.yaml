@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: "ravendb-cluster-creator"
+  namespace: ravendb
   labels:
     heritage: {{.Release.Service | quote }}
     release: {{.Release.Name | quote }}
@@ -13,9 +14,9 @@ spec:
     - name: ravendb-scripts
       configMap:
         name: ravendb-scripts
-    - name: ravendb-pack
+    - name: ravendb-setup-package
       secret:
-        secretName: ravendb-pack
+        secretName: ravendb-setup-package
   containers:
   - name: main
     image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
@@ -24,5 +25,5 @@ spec:
     volumeMounts:
       - name: ravendb-scripts
         mountPath: /ravendb/scripts
-      - name: ravendb-pack
-        mountPath: /usr/ravendb
+      - name: ravendb-setup-package
+        mountPath: /ravendb/ravendb-setup-package

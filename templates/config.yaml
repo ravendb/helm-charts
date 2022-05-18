@@ -2,6 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: ravendb-scripts
+  namespace: ravendb
   labels:
     app: ravendb
     heritage: {{$.Release.Service | quote }}
@@ -11,7 +12,6 @@ data:
 {{ (.Files.Glob "scripts/create-cluster.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/get-server-cert.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/update-cert.sh").AsConfig | indent 2 }}
-{{ (.Files.Glob "scripts/renew-cert.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/set-cert.sh").AsConfig | indent 2 }}
   domain: {{.Values.domain}}
 
@@ -23,14 +23,15 @@ metadata:
   namespace: ingress-nginx
 data:
   {{- range .Values.nodes }}
-  {{.publicTcpPort}}: "default/ravendb-{{.nodeTag | lower }}:38888"
+  {{.publicTcpPort}}: "ravendb/ravendb-{{.nodeTag | lower }}:38888"
   {{- end }}
 ---
 
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ravendb-pack
+  namespace: ravendb
+  name: ravendb-setup-package
 type: Opaque
 data:
 {{ (.Files.Glob .Values.packageFilePath).AsSecrets | indent 2 }}
@@ -40,6 +41,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
+  namespace: ravendb
   name: ravendb-certs
 type: Opaque
 data:

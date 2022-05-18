@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: "ravendb-{{ .nodeTag | lower }}"
+  namespace: ravendb
   labels:
     app: ravendb
 spec:

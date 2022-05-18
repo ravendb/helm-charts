@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: "ravendb-{{.nodeTag | lower }}"
+  namespace: ravendb
   annotations: 
     ingress.kubernetes.io/ssl-passthrough: "true"
   labels:
@@ -32,7 +33,7 @@ spec:
         volumeMounts:
           - name: ravendb-scripts
             mountPath: /ravendb/scripts
-          - name: ravendb-pack
+          - name: ravendb-setup-package
             mountPath: /usr/ravendb
           - name: ravendb-certs
             mountPath: /ravendb/certs
@@ -58,7 +59,7 @@ spec:
         # - name: RAVEN_AcmeUrl
         #   value: "https://acme-staging-v02.api.letsencrypt.org/directory"
         - name: RAVEN_ARGS
-          value: --Security.UnsecuredAccessAllowed=PublicNetwork --Security.Certificate.Load.Exec=/ravendb/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/ravendb/scripts/update-cert.sh --Security.Certificate.Renew.Exec=/ravendb/scripts/renew-cert.sh
+          value: --Security.UnsecuredAccessAllowed=PublicNetwork --Security.Certificate.Load.Exec=/ravendb/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/ravendb/scripts/update-cert.sh
         - name: RAVEN_ServerUrl
           value: "https://0.0.0.0:443"
         - name: RAVEN_ServerUrl_Tcp
@@ -74,7 +75,7 @@ spec:
         volumeMounts:
           - name: ravendb-scripts
             mountPath: /ravendb/scripts
-          - name: ravendb-pack
+          - name: ravendb-setup-package
             mountPath: /usr/ravendb
           - name: ravendb-certs
             mountPath: /ravendb/certs
@@ -85,9 +86,9 @@ spec:
           configMap:
             name: ravendb-scripts
             defaultMode: 0700
-        - name: ravendb-pack
+        - name: ravendb-setup-package
           secret:
-            secretName: ravendb-pack
+            secretName: ravendb-setup-package
         - name: ravendb-certs
           secret:
             secretName: ravendb-certs

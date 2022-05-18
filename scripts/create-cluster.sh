@@ -1,20 +1,19 @@
 #!/bin/bash
-
+echo "Installing prerequisites..."
 # prerequisites
 apt-get update
 apt-get install curl unzip -y
 
 # copy the package from readonly volume
-echo "Copying /usr/ravendb/pack.zip to the /ravendb folder..."
-cp /usr/ravendb/pack.zip /ravendb/pack.zip
+echo "Copying /ravendb/ravendb-setup-package-readonly/pack.zip to the /ravendb folder..."
+cp -v /ravendb/ravendb-setup-package/pack.zip /ravendb/pack.zip
 
 # unzip the pack
 echo "Extracting files from the pack..."
-mkdir /ravendb/ravendb-pack
-cd /ravendb || exit
-unzip -qq pack.zip -d ./ravendb-pack/ > /dev/null
-cd ravendb-pack || exit
-cd A || exit
+mkdir /ravendb/ravendb-setup-package-copy
+cd /ravendb || exit 1
+unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
+cd ravendb-setup-package-copy/A || exit 1
 
 # fetch domain name and validate it
 echo "Validating domain name..."
@@ -33,23 +32,20 @@ openssl pkcs12 -in "$(find ./*certificate*)" -password pass: -out cert.pem -node
 # todo: get nodes tags from .Values
 
 # send requests that will create cluster using converted certificate 
-uriB='https://a.'$domain_name'/admin/cluster/node?url=https%3A%2F%2Fb.'$domain_name'&watcher=false&tag=B'
-uriC='https://a.'$domain_name'/admin/cluster/node?url=https%3A%2F%2Fc.'$domain_name'&watcher=false&tag=C'
+uriB="https://a.$domain_name/admin/cluster/node?url=https%3A%2F%2Fb.$domain_name&watcher=false&tag=B"
+uriC="https://a.$domain_name/admin/cluster/node?url=https%3A%2F%2Fc.$domain_name&watcher=false&tag=C"
 echo "Waiting for nodes to stand up..." 
-while ! curl "https://a.$domain_name/setup/alive"
+
+tags=("a" "b" "c")
+
+
+for tag in "${tags[@]}"
+do
+while ! curl "https://$tag.$domain_name/setup/alive"
 do
     echo -n "."
     sleep 3
 done
-while ! curl "https://b.$domain_name/setup/alive"
-do
-    echo -n "."
-    sleep 3
-done
-while ! curl "https://c.$domain_name/setup/alive"
-do
-    echo -n "."
-    sleep 3
 done
 
 echo
