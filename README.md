@@ -33,8 +33,8 @@ names to ingress controller IP address.
 *e.g. Additional record inside /etc/hosts file, `192.168.1.15` is my local IP address, running nginx on local machine k8s cluster*
 
 ```
-192.168.1.15 a.poisson.development.run b.poisson.development.run c.poisson.development.run 
-192.168.1.15 a-tcp.poisson.development.run b-tcp.poisson.development.run c-tcp.poisson.development.run 
+192.168.1.15 a.raven.domain.com b.raven.domain.com c.raven.domain.com 
+192.168.1.15 a-tcp.raven.domain.com b-tcp.raven.domain.com c-tcp.raven.domain.com 
 ```
 
 *Dns records can't point to localhost/loopback/0.0.0.0, basically it'll tell the pods to reach nginx on themselves, not on our machine - use your local IP address.*
