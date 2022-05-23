@@ -12,7 +12,7 @@ data:
 {{ (.Files.Glob "scripts/create-cluster.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/get-server-cert.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/update-cert.sh").AsConfig | indent 2 }}
-{{ (.Files.Glob "scripts/set-cert.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "scripts/initialize-pod.sh").AsConfig | indent 2 }}
   domain: {{.Values.domain}}
 
 ---
@@ -27,6 +27,17 @@ data:
   {{- end }}
 ---
 
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ravendb-env
+  namespace: ravendb
+  labels:
+    app: ravendb
+data:
+  raven_setup_mode: ""
+  raven_security_certificate_letsencrypt_email: ""
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -48,3 +59,7 @@ data:
   {{- range .Values.nodes }}
   {{.nodeTag | lower}}.pfx: {{ "no-cert" | b64enc}}
   {{- end }}
+
+---
+
+  

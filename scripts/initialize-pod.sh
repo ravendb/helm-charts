@@ -16,7 +16,7 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 # copy zip from the secret
 echo "Copying RavenDB setup package to /ravendb"
-cp /usr/ravendb/pack.zip /ravendb/pack.zip
+cp "$(find /usr/ravendb/*.zip)" /ravendb/pack.zip
 cd /ravendb
 
 # unzip the pack
@@ -24,6 +24,22 @@ echo "Extracting files from the pack..."
 mkdir /ravendb/ravendb-setup-package
 unzip -qq pack.zip -d ./ravendb-setup-package/ > /dev/null
 cd ravendb-setup-package
+
+
+echo "Reading envrionmental values from the settings.json"
+setup_mode="$( jq -r '."Setup.Mode"' A/settings.json )"
+echo "Setup.Mode is $setup_mode"
+
+if [ "$setup_mode" = "LetsEncrypt" ]; then
+lets_encrypt_email="$( jq -r '."Security.Certificate.LetsEncrypt.Email"' A/settings.json )"
+else
+lets_encrypt_email="not found"
+fi
+
+echo "Security.Certificate.LetsEncrypt.Email is $lets_encrypt_email"
+
+echo "Updating ravendb-env config map"
+kubectl get cm -n ravendb -o json ravendb-env | jq "(.data[\"raven_setup_mode\"]=\"$setup_mode\" | .data[\"raven_security_certificate_letsencrypt_email\"]=\"$lets_encrypt_email\")" | kubectl apply -f -
 
 echo "Reading node tag from the HOSTNAME environmental..."
 node_tag="$(env | grep HOSTNAME | cut -f 2 -d '-')"

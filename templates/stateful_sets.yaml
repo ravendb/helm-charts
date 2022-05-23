@@ -20,16 +20,17 @@ spec:
   replicas: 1
   template:
     metadata:
+      namespace: ravendb
       labels:
         nodeTag: "{{.nodeTag}}"
     spec:
       dnsPolicy: Default
-      serviceAccountName: modify-secrets
+      serviceAccountName: modify-config
       initContainers:
       - name: "{{$.Chart.Name}}-init"
         image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
         command: ["/bin/bash"]
-        args: ["/ravendb/scripts/set-cert.sh"]
+        args: ["/ravendb/scripts/initialize-pod.sh"]
         volumeMounts:
           - name: ravendb-scripts
             mountPath: /ravendb/scripts
@@ -37,6 +38,8 @@ spec:
             mountPath: /usr/ravendb
           - name: ravendb-certs
             mountPath: /ravendb/certs
+          - name: ravendb-env
+            mountPath: /ravendb/env
             readOnly: false
       containers:
       - name: ravendb-container
@@ -52,14 +55,18 @@ spec:
           value: 'true'
         - name: RAVEN_License
           value: {{ $.Files.Get $.Values.licenseFilePath | toPrettyJson }}
-        - name: RAVEN_Security_Certificate_LetsEncrypt_Email
-          value: {{$.Values.letsEncryptEmail}}
         - name: RAVEN_Setup_Mode
-          value: "LetsEncrypt"
-        # - name: RAVEN_AcmeUrl
-        #   value: "https://acme-staging-v02.api.letsencrypt.org/directory"
+          valueFrom:
+            configMapKeyRef:
+              name: ravendb-env
+              key: raven_setup_mode
+        - name: RAVEN_Security_Certificate_LetsEncrypt_Email
+          valueFrom:
+            configMapKeyRef:
+              name: ravendb-env
+              key: raven_security_certificate_letsencrypt_email
         - name: RAVEN_ARGS
-          value: --Security.UnsecuredAccessAllowed=PublicNetwork --Security.Certificate.Load.Exec=/ravendb/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/ravendb/scripts/update-cert.sh
+          value: --Security.Certificate.Load.Exec=/ravendb/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/ravendb/scripts/update-cert.sh
         - name: RAVEN_ServerUrl
           value: "https://0.0.0.0:443"
         - name: RAVEN_ServerUrl_Tcp
@@ -81,10 +88,16 @@ spec:
             mountPath: /ravendb/certs
           - name: "ravendb"
             mountPath: /opt/RavenDB/Server/RavenData
+          - name: ravendb-env
+            mountPath: /ravendb/env
       volumes:
         - name: ravendb-scripts
           configMap:
             name: ravendb-scripts
+            defaultMode: 0700
+        - name: ravendb-env
+          configMap:
+            name: ravendb-env
             defaultMode: 0700
         - name: ravendb-setup-package
           secret:

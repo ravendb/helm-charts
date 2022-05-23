@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -e
+
 echo "Installing prerequisites..."
 # prerequisites
 apt-get update
@@ -11,9 +14,9 @@ cp -v /ravendb/ravendb-setup-package/pack.zip /ravendb/pack.zip
 # unzip the pack
 echo "Extracting files from the pack..."
 mkdir /ravendb/ravendb-setup-package-copy
-cd /ravendb || exit 1
+cd /ravendb
 unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
-cd ravendb-setup-package-copy/A || exit 1
+cd ravendb-setup-package-copy/A
 
 # fetch domain name and validate it
 echo "Validating domain name..."
