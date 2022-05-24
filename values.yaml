@@ -1,9 +1,14 @@
 domain: "poisson.development.run"
+# Helm does not recommend using floating image tags like latest, head etc.
+# It is recommended to use a fixed tag.
 ravenImageTag: latest
 licenseFilePath: misc/license.json
 packageFilePath: misc/pack.zip
 storageSize: 5Gi
 ingressClassName: nginx
+
+imagePullPolicy: IfNotPresent
+
 # RavenDB nodes
 # todo: allow to define more than 3 nodes with custom tags etc.
 nodes:

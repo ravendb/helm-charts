@@ -4,10 +4,10 @@ metadata:
   name: "ravendb-cluster-creator"
   namespace: ravendb
   labels:
-    heritage: {{.Release.Service | quote }}
-    release: {{.Release.Name | quote }}
-    chart: "{{.Chart.Name}}-{{.Chart.Version}}"
-    app: ravendb
+    app.kubernetes.io/name: ravendb
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
   restartPolicy: OnFailure
   volumes:
@@ -19,7 +19,7 @@ spec:
         secretName: ravendb-setup-package
   containers:
   - name: main
-    image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
+    image: "ubuntu:latest" # todo: use lighter distro to run the scripts
     command: ["/bin/bash"]
     args: ["/ravendb/scripts/create-cluster.sh"]
     volumeMounts:

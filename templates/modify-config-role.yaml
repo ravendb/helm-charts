@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: modify-config
+  namespace: ravendb
+  labels:
+    app.kubernetes.io/name: ravendb
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+rules:
+  - apiGroups: [""]
+    resources:
+      - secrets
+      - configmaps
+    verbs:
+      - get
+      - patch

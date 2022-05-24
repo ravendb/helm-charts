@@ -32,8 +32,6 @@ fi
 echo "Converting pfx to pem..."
 openssl pkcs12 -in "$(find ./*certificate*)" -password pass: -out cert.pem -nodes -legacy
 
-# todo: get nodes tags from .Values
-
 # send requests that will create cluster using converted certificate 
 uriB="https://a.$domain_name/admin/cluster/node?url=https%3A%2F%2Fb.$domain_name&watcher=false&tag=B"
 uriC="https://a.$domain_name/admin/cluster/node?url=https%3A%2F%2Fc.$domain_name&watcher=false&tag=C"

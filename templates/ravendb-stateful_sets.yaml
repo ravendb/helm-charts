@@ -7,10 +7,10 @@ metadata:
   annotations: 
     ingress.kubernetes.io/ssl-passthrough: "true"
   labels:
-    heritage: {{$.Release.Service | quote }}
-    release: {{$.Release.Name | quote }}
-    chart: "{{$.Chart.Name}}-{{$.Chart.Version}}"
-    app: ravendb
+    app.kubernetes.io/name: ravendb
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    helm.sh/chart: "{{ $.Chart.Name }}-{{ $.Chart.Version | replace "+" "_" }}"
     nodeTag: "{{.nodeTag}}"
 spec:
   selector:
@@ -26,11 +26,14 @@ spec:
     spec:
       dnsPolicy: Default
       serviceAccountName: modify-config
+    
       initContainers:
       - name: "{{$.Chart.Name}}-init"
-        image: "ubuntu:latest" # todo: use more lightweight distro like alpine with bash
+        # todo: use lighter distro to run the scripts
+        image: "ubuntu:latest"  
         command: ["/bin/bash"]
         args: ["/ravendb/scripts/initialize-pod.sh"]
+
         volumeMounts:
           - name: ravendb-scripts
             mountPath: /ravendb/scripts
@@ -41,20 +44,19 @@ spec:
           - name: ravendb-env
             mountPath: /ravendb/env
             readOnly: false
+
       containers:
       - name: ravendb-container
         image: "ravendb/ravendb:{{$.Values.ravenImageTag}}"
+        imagePullPolicy: {{ $.Values.imagePullPolicy }}
         ports:
         - containerPort: 443
           name: https
         - containerPort: 38888
           name: tcp
           protocol: TCP
+
         env:
-        - name: RAVEN_License_Eula_Accepted
-          value: 'true'
-        - name: RAVEN_License
-          value: {{ $.Files.Get $.Values.licenseFilePath | toPrettyJson }}
         - name: RAVEN_Setup_Mode
           valueFrom:
             configMapKeyRef:
@@ -65,20 +67,30 @@ spec:
             configMapKeyRef:
               name: ravendb-env
               key: raven_security_certificate_letsencrypt_email
-        - name: RAVEN_ARGS
-          value: --Security.Certificate.Load.Exec=/ravendb/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/ravendb/scripts/update-cert.sh
+
+        - name: RAVEN_License_Eula_Accepted
+          value: 'true'
         - name: RAVEN_ServerUrl
           value: "https://0.0.0.0:443"
         - name: RAVEN_ServerUrl_Tcp
           value: "tcp://0.0.0.0:38888"
+
+        - name: RAVEN_ARGS
+          value: --Security.Certificate.Load.Exec=/ravendb/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/ravendb/scripts/update-cert.sh
+        - name: RAVEN_License
+          value: {{ $.Files.Get $.Values.licenseFilePath | toPrettyJson }}
+
         - name: RAVEN_PublicServerUrl
           value: "https://{{ .nodeTag | lower }}.{{$.Values.domain}}:443"
         - name: RAVEN_PublicServerUrl_Tcp
           value: "tcp://{{ .nodeTag | lower }}-tcp.{{$.Values.domain}}:{{.publicTcpPort}}"
+
+        # The environmental values defined in the values.yaml should be listed below this comment while debugging
         {{- range $key, $val := $.Values.environment }}
         - name: {{ $key }}
           value: {{ $val }}
         {{ end -}}
+
         volumeMounts:
           - name: ravendb-scripts
             mountPath: /ravendb/scripts
@@ -90,6 +102,7 @@ spec:
             mountPath: /opt/RavenDB/Server/RavenData
           - name: ravendb-env
             mountPath: /ravendb/env
+
       volumes:
         - name: ravendb-scripts
           configMap:
@@ -99,12 +112,13 @@ spec:
           configMap:
             name: ravendb-env
             defaultMode: 0700
-        - name: ravendb-setup-package
-          secret:
-            secretName: ravendb-setup-package
         - name: ravendb-certs
           secret:
             secretName: ravendb-certs
+        - name: ravendb-setup-package
+          secret:
+            secretName: ravendb-setup-package
+
   volumeClaimTemplates:
     - metadata:
         name: ravendb

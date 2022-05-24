@@ -5,7 +5,9 @@ metadata:
   namespace: ravendb
   labels:
     app.kubernetes.io/name: ravendb
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
   annotations:
     ingress.kubernetes.io/backend-protocol: HTTPS
     ingress.kubernetes.io/ssl-passthrough: "true"

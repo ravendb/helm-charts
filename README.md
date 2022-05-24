@@ -5,15 +5,50 @@ This Helm chart provides all necessary components for the secured RavenDB cluste
 
 ---
 
+## Prerequisites 
+
+- RavenDB License (obtained via https://ravendb.net - also works with the free developer license)
+- RavenDB Setup Package (created using RavenDB Setup Wizard or with the *rvn* utility)
+
+---
+
 ## Installation
 
 `helm install [name] [chart path]`
 
 
-Before installation you need to specify your RavenDB license file path inside `values.yaml`, or copy the license json to the  `misc/license.json` file.
-Also, provide your domain name, Let's Encrypt email, and path to RavenDB certificates & license package (e.g. from `rvn create-package` tool).
+Before installation you should customize `values.yaml`.
+- Specify your RavenDB license file path (`misc/license.json` by default).
+- Enter your *domain name* and path to *RavenDB setup package*.
+- Enter how much `storageSize` would you like to have on each node.
+- Optionally, provide a desired RavenDB image tag (`latest` by default).
+- In some cases you might want to edit [image pull policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy).
+- If you need some environmental values inside the RavenDB container, you can define them in the `environment` map.
 
-Optionally, you can provide a custom version of RavenDB (latest by default) or a node storage size.
+### Example values.yaml
+
+```yaml
+domain: "ravendb.poisson.net"
+ravenImageTag: latest
+licenseFilePath: misc/license.json
+packageFilePath: misc/pack.zip
+storageSize: 5Gi
+ingressClassName: nginx
+imagePullPolicy: IfNotPresent
+
+nodes:
+  - nodeTag: "A"
+    publicTcpPort: 38887
+  - nodeTag: "B"
+    publicTcpPort: 38888
+  - nodeTag: "C"
+    publicTcpPort: 38889
+
+environment:
+  SOME_ENV_VALUE: 'foo'
+  SOME_OTHER_ENV_VALUE: 'bar'
+```
+
  
 
 ![](.github/helm_install.gif)
@@ -23,6 +58,7 @@ Optionally, you can provide a custom version of RavenDB (latest by default) or a
 ## How do I make this work?
 
 ## Configure your DNS 
+
 Make sure that your DNS contains records that translate RavenDB nodes addresses to the ingress controller IP address. Pods need these to talk to each self. You need to translate 
 - `<nodeTag>.[domain]`
 - `<nodeTag>-tcp.[domain]`
@@ -33,8 +69,8 @@ names to ingress controller IP address.
 *e.g. Additional record inside /etc/hosts file, `192.168.1.15` is my local IP address, running nginx on local machine k8s cluster*
 
 ```
-192.168.1.15 a.poisson.development.run b.poisson.development.run c.poisson.development.run 
-192.168.1.15 a-tcp.poisson.development.run b-tcp.poisson.development.run c-tcp.poisson.development.run 
+192.168.1.15 a.raven.domain.com b.raven.domain.com c.raven.domain.com 
+192.168.1.15 a-tcp.raven.domain.com b-tcp.raven.domain.com c-tcp.raven.domain.com 
 ```
 
 *Dns records can't point to localhost/loopback/0.0.0.0, basically it'll tell the pods to reach nginx on themselves, not on our machine - use your local IP address.*
@@ -42,14 +78,17 @@ names to ingress controller IP address.
 ---
 
 ## Set up your ingress controller
+
 It must be able to **expose tcp services** and **passthrough SSL** like Nginx/HAProxy.
 
 
 ## NGINX
+
 You need to deploy nginx with additional `--tcp-services-configmap=ingress-nginx/tcp-services` arg.
 For secured cluster configuration it is also needed to use `--enable-ssl-passthrough` option.
 
 ### Deploying Nginx on Kubernetes
+
 If you've deployed k8s nginx before, its dependencies are frequently stored in the 'ingress-nginx' namespace.
 You can deploy nginx to k8s using the `nginx-ingress-ravendb.yaml` file located in the misc folder, which is preconfigured for default nodes/tags/ports and secured connection.
 It is not necessary, but running `kubectl delete all --all -n ingress-nginx` should delete all nginx k8s depts before another deployment.
@@ -61,6 +100,7 @@ If you want to configure it manually, make sure that...
 - ... --enable-ssl-passthrough is set (when working with secured cluster)
 
 ## HAProxy, Traefik and others
+
 For first and most important, **check if your ingress controller supports exposing TCP services**. If it does, start with changing the `ingressClassName` in the `values.yaml`, enter your deployed ingress class name.
 
 e.g. `ingressClassName: haproxy`
@@ -79,6 +119,7 @@ https://serversforhackers.com/c/using-ssl-certificates-with-haproxy
 ----
 
 ## Rolling updates
+
 You can perform rolling update using the `rolling-update.sh` script located in the `/scripts` directory. Provide desired RavenDB image tag from the DockerHub https://hub.docker.com/r/ravendb/ravendb/tags as the first arg and path to the Helm chart as the second.
 
 `./rolling-update.sh latest ~/ravendb-chart`

@@ -5,7 +5,10 @@ metadata:
   name: "ravendb-{{ .nodeTag | lower }}"
   namespace: ravendb
   labels:
-    app: ravendb
+    app.kubernetes.io/name: ravendb
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    helm.sh/chart: "{{ $.Chart.Name }}-{{ $.Chart.Version | replace "+" "_" }}"
 spec:
   ports:
   - port: 443
