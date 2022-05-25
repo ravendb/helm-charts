@@ -5,11 +5,11 @@ set -e
 echo "Installing prerequisites..."
 # prerequisites
 apt-get update
-apt-get install curl unzip -y
+apt-get install curl unzip jq -y
 
 # copy the package from readonly volume
 echo "Copying /ravendb/ravendb-setup-package-readonly/pack.zip to the /ravendb folder..."
-cp -v /ravendb/ravendb-setup-package/pack.zip /ravendb/pack.zip
+cp -v /ravendb/ravendb-setup-package/*.zip /ravendb/pack.zip
 
 # unzip the pack
 echo "Extracting files from the pack..."
@@ -20,11 +20,11 @@ cd ravendb-setup-package-copy/A
 
 # fetch domain name and validate it
 echo "Validating domain name..."
-domain_name=$( tail -2 settings.json | head -1 | cut -f 3 -d : | cut -c 5-)
+domain_name=$( jq -r .PublicServerUrl settings.json | cut -d. -f2- )
 
 domain_name_values="$(cat /ravendb/scripts/domain)"
 if [ "$domain_name" != "$domain_name_values" ]; then
-    echo "Domain name from values.yaml doesn't match domain name from the .zip package"
+    echo "Domain name '$domain_name_values' from values.yaml doesn't match domain name '$domain_name' from the .zip package."
     exit
 fi
 
