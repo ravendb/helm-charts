@@ -20,7 +20,7 @@ cd ravendb-setup-package-copy/A
 
 # fetch domain name and validate it
 echo "Validating domain name..."
-domain_name=$( jq -r .PublicServerUrl settings.json | cut -d. -f2- )
+domain_name=$( jq -r .PublicServerUrl settings.json | cut -d. -f2- | cut -d: -f1 )
 
 domain_name_values="$(cat /ravendb/scripts/domain)"
 if [ "$domain_name" != "$domain_name_values" ]; then
