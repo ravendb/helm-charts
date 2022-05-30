@@ -68,6 +68,12 @@ spec:
               name: ravendb-env
               key: raven_security_certificate_letsencrypt_email
 
+        - name: RAVEN_License
+          valueFrom:
+            configMapKeyRef:
+              name: ravendb-env
+              key: raven_license
+
         - name: RAVEN_License_Eula_Accepted
           value: 'true'
         - name: RAVEN_ServerUrl
@@ -77,8 +83,6 @@ spec:
 
         - name: RAVEN_ARGS
           value: --Security.Certificate.Load.Exec=/ravendb/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/ravendb/scripts/update-cert.sh
-        - name: RAVEN_License
-          value: {{ $.Files.Get $.Values.licenseFilePath | toPrettyJson }}
 
         - name: RAVEN_PublicServerUrl
           value: "https://{{ .nodeTag | lower }}.{{$.Values.domain}}:443"

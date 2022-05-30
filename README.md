@@ -18,7 +18,6 @@ This Helm chart provides all necessary components for the secured RavenDB cluste
 
 
 Before installation you should customize `values.yaml`.
-- Specify your RavenDB license file path (`misc/license.json` by default).
 - Enter your *domain name* and path to *RavenDB setup package*.
 - Enter how much `storageSize` would you like to have on each node.
 - Optionally, provide a desired RavenDB image tag (`latest` by default).
@@ -30,7 +29,6 @@ Before installation you should customize `values.yaml`.
 ```yaml
 domain: "ravendb.poisson.net"
 ravenImageTag: latest
-licenseFilePath: misc/license.json
 packageFilePath: misc/pack.zip
 storageSize: 5Gi
 ingressClassName: nginx

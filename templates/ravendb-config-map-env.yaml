@@ -9,5 +9,6 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 data:
+  raven_license: ""
   raven_setup_mode: ""
   raven_security_certificate_letsencrypt_email: ""
