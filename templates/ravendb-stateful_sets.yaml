@@ -86,10 +86,12 @@ spec:
           value: "tcp://{{ .nodeTag | lower }}-tcp.{{$.Values.domain}}:{{.publicTcpPort}}"
 
         # The environmental values defined in the values.yaml should be listed below this comment while debugging
+        {{ if ( $.Values.environment )}}
         {{- range $key, $val := $.Values.environment }}
         - name: {{ $key }}
           value: {{ $val }}
         {{ end -}}
+        {{ end }}
 
         volumeMounts:
           - name: ravendb-scripts
