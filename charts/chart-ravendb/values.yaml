@@ -17,5 +17,6 @@ nodes:
     publicTcpPort: 38888
   - nodeTag: "C"
     publicTcpPort: 38889
+
 environment:
   MY_ENV: 'amongus'
