@@ -115,6 +115,6 @@ https://serversforhackers.com/c/using-ssl-certificates-with-haproxy
 
 You can perform rolling update using the `rolling-update.sh` script located in the `/scripts` directory. Provide desired RavenDB image tag from the DockerHub https://hub.docker.com/r/ravendb/ravendb/tags as the first arg and path to the Helm chart as the second.
 
-`./rolling-update.sh latest ~/ravendb-chart`
+`./rolling-update.sh latest ~/ravendb-cluster`
 
 It'll execute rolling update strategy and update your pods image tags.
