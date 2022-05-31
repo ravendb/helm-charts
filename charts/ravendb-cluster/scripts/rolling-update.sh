@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script is executing rolling update and takes the new ravenImageTag value as an first argument
-# As a second argument pass path to your ravendb-chart
+# As a second argument pass path to your ravendb-cluster
 echo "Installing yq"
 sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
 sudo chmod a+x /usr/local/bin/yq
@@ -8,7 +8,7 @@ sudo chmod a+x /usr/local/bin/yq
 
 if [ $# != 2 ]
 then
-echo "Please pass two args, ravenImageTag and path to ravendb-chart"
+echo "Please pass two args, ravenImageTag and path to ravendb-cluster"
 exit 0
 fi
 
