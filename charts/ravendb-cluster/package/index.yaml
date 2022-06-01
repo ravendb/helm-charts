@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  ravendb:
+  - apiVersion: v1
+    appVersion: "5.3"
+    created: "2022-06-01T09:41:05.3700933+02:00"
+    description: Chart for RavenDB Cluster
+    digest: 628721e4f4a770853f2d8b5fe6edd906d6b6d17f0c29374067cb3b962c7e4a9d
+    icon: https://ravendb.net/img/repository-icon.svg
+    name: ravendb
+    urls:
+    - https://ravendb.github.io/helm-charts/charts/ravendb-cluster/ravendb-1.0.0.tgz
+    version: 1.0.0
+generated: "2022-06-01T09:41:05.3669599+02:00"

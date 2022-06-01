@@ -3,3 +3,4 @@ appVersion: "5.3"
 description: Chart for RavenDB Cluster
 name: ravendb
 version: 1.0.0
+icon: https://ravendb.net/img/repository-icon.svg
