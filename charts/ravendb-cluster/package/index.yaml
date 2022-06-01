@@ -9,6 +9,6 @@ entries:
     icon: https://ravendb.net/img/repository-icon.svg
     name: ravendb
     urls:
-    - https://ravendb.github.io/helm-charts/charts/ravendb-cluster/ravendb-1.0.0.tgz
+    - https://ravendb.github.io/helm-charts/charts/ravendb-cluster/package/ravendb-1.0.0.tgz
     version: 1.0.0
 generated: "2022-06-01T09:41:05.3669599+02:00"
