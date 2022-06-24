@@ -62,17 +62,24 @@ spec:
             configMapKeyRef:
               name: ravendb-env
               key: raven_setup_mode
+            
         - name: RAVEN_Security_Certificate_LetsEncrypt_Email
           valueFrom:
             configMapKeyRef:
               name: ravendb-env
               key: raven_security_certificate_letsencrypt_email
-
+        
         - name: RAVEN_License
           valueFrom:
             configMapKeyRef:
               name: ravendb-env
               key: raven_license
+
+        - name: RAVEN_ARGS
+          valueFrom:
+            configMapKeyRef:
+              name: ravendb-env
+              key: raven_args
 
         - name: RAVEN_License_Eula_Accepted
           value: 'true'
@@ -80,9 +87,6 @@ spec:
           value: "https://0.0.0.0:443"
         - name: RAVEN_ServerUrl_Tcp
           value: "tcp://0.0.0.0:38888"
-
-        - name: RAVEN_ARGS
-          value: --Security.Certificate.Load.Exec=/ravendb/scripts/get-server-cert.sh --Security.Certificate.Exec.TimeoutInSec=60 --Security.Certificate.Change.Exec=/ravendb/scripts/update-cert.sh
 
         - name: RAVEN_PublicServerUrl
           value: "https://{{ .nodeTag | lower }}.{{$.Values.domain}}:443"
