@@ -26,24 +26,27 @@ Before installation you should run `prepare-cluster-config.py` and then customiz
 
 ```yaml
 domain: "ravendb.poisson.net"
-ravenImageTag: latest
-packageFileGlobPath: misc/pack.zip
-storageSize: 5Gi
-ingressClassName: nginx
-imagePullPolicy: IfNotPresent
-license: < license json >
-
-nodes:
-  - nodeTag: "A"
-    publicTcpPort: 38887
-  - nodeTag: "B"
-    publicTcpPort: 38888
-  - nodeTag: "C"
-    publicTcpPort: 38889
-
 environment:
   SOME_ENV_VALUE: 'foo'
   SOME_OTHER_ENV_VALUE: 'bar'
+imagePullPolicy: IfNotPresent
+ingressClassName: nginx
+letsEncryptEmail: user@example.net
+license: < license json >
+
+nodes:
+  - nodeTag: a
+    publicTcpPort: 38881
+  - nodeTag: b
+    publicTcpPort: 38882
+  - nodeTag: c
+    publicTcpPort: 38883
+
+packageFileGlobPath: misc/pack.zip
+ravenImageTag: latest
+setupMode: LetsEncrypt
+storageSize: 5Gi
+
 ```
 
  

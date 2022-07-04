@@ -17,11 +17,17 @@ parser.add_argument("values_path", type=str, help="Path to existing values.yaml"
 parser.add_argument(
     "setup_package_path", type=str, help="Path to RavenDB setup package (.zip)"
 )
-
+parser.add_argument(
+    "-o",
+    "--output",
+    action="store_true",
+    help="Create a new file instead of updating an existing one.",
+)
 
 ARGS = parser.parse_args()
 VALUES_YAML_PATH = ARGS.values_path
 SETUP_PACKAGE_PATH = ARGS.setup_package_path
+CREATE_NEW_FILE = ARGS.output
 
 
 class NodeInfo:
@@ -66,16 +72,15 @@ class ClusterInfo:
 
 
 def get_cluster_info_from_setup_package(setup_package_zip_path: str) -> ClusterInfo:
-    zip_file = zipfile.ZipFile(setup_package_zip_path, "r")
-    os.mkdir("./package")
-
-    letsencrypt_email = None
-    node_infos = []
-    
-    print(f"Extracting files from {SETUP_PACKAGE_PATH}...")
-
-    zip_file.extractall("./package")
-    zip_file.close()
+    try:
+        with zipfile.ZipFile(setup_package_zip_path, "r") as zip_file:
+            os.mkdir("./package")
+            letsencrypt_email = None
+            node_infos = []
+            print(f"Extracting files from {SETUP_PACKAGE_PATH}...")
+            zip_file.extractall("./package")
+    except Exception as e:
+        raise IOError("Cannot open the setup package file. File not found or is corrupted.", e)
 
     atexit.register(rmtree, "./package")
 
@@ -85,7 +90,7 @@ def get_cluster_info_from_setup_package(setup_package_zip_path: str) -> ClusterI
         ravendb_license_string = license_file_ref.read()
 
     last_settings_json = None
-    
+
     print("Reading nodes settings..")
 
     # Gather settings json hooks
@@ -111,11 +116,13 @@ def get_cluster_info_from_setup_package(setup_package_zip_path: str) -> ClusterI
 
 
 def update_values_yaml(cluster_info: ClusterInfo, values_yaml_path: str) -> None:
-    try:
-        with open(values_yaml_path, "r+") as values_file:
-            values_yaml = yaml.safe_load(values_file)
-    except Exception as e:
-        raise IOError("Failed to load values.yaml file", e)
+    values_yaml = {}
+    if not CREATE_NEW_FILE:
+        try:
+            with open(values_yaml_path, "r") as values_file:
+                values_yaml = yaml.safe_load(values_file)
+        except Exception as e:
+            raise IOError("Failed to load values.yaml file", e)
 
     values_yaml.update(cluster_info.to_yaml())
 
