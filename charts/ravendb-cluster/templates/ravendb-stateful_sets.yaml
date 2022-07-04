@@ -41,9 +41,6 @@ spec:
             mountPath: /usr/ravendb
           - name: ravendb-certs
             mountPath: /ravendb/certs
-          - name: ravendb-env
-            mountPath: /ravendb/env
-            readOnly: false
 
       containers:
       - name: ravendb-container
@@ -58,31 +55,28 @@ spec:
 
         env:
         - name: RAVEN_Setup_Mode
-          valueFrom:
-            configMapKeyRef:
-              name: ravendb-env
-              key: raven_setup_mode
-            
-        - name: RAVEN_Security_Certificate_LetsEncrypt_Email
-          valueFrom:
-            configMapKeyRef:
-              name: ravendb-env
-              key: raven_security_certificate_letsencrypt_email
-        
-        - name: RAVEN_License
-          valueFrom:
-            configMapKeyRef:
-              name: ravendb-env
-              key: raven_license
+          value : {{ $.Values.setupMode }}
 
-        - name: RAVEN_ARGS
-          valueFrom:
-            configMapKeyRef:
-              name: ravendb-env
-              key: raven_args
+        - name: RAVEN_Security_Certificate_Load_Exec
+          value: /ravendb/scripts/get-server-cert.sh
+
+        - name: RAVEN_Security_Certificate_Exec_TimeoutInSec
+          value: "60"
+
+        {{ if eq $.Values.setupMode "LetsEncrypt" }}
+        - name: RAVEN_Security_Certificate_LetsEncrypt_Email
+          value: {{ $.Values.letsEncryptEmail }}
+
+        - name: RAVEN_Security_Certificate_Change_Exec
+          value: /ravendb/scripts/update-cert.sh
+        {{ end }}
+
+        - name: RAVEN_License
+          value: {{ $.Values.license | toJson }}
 
         - name: RAVEN_License_Eula_Accepted
           value: 'true'
+
         - name: RAVEN_ServerUrl
           value: "https://0.0.0.0:443"
         - name: RAVEN_ServerUrl_Tcp
@@ -110,17 +104,11 @@ spec:
             mountPath: /ravendb/certs
           - name: "ravendb"
             mountPath: /opt/RavenDB/Server/RavenData
-          - name: ravendb-env
-            mountPath: /ravendb/env
 
       volumes:
         - name: ravendb-scripts
           configMap:
             name: ravendb-scripts
-            defaultMode: 0700
-        - name: ravendb-env
-          configMap:
-            name: ravendb-env
             defaultMode: 0700
         - name: ravendb-certs
           secret:

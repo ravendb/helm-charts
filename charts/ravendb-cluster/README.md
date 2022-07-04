@@ -15,7 +15,7 @@ This Helm chart provides all necessary components for the secured RavenDB cluste
 `helm install [name] [chart path]`
 
 
-Before installation you should customize `values.yaml`.
+Before installation you should run `prepare-cluster-config.py` and then customize `values.yaml`.
 - Enter your *domain name* and path to *RavenDB setup package*.
 - Enter how much `storageSize` would you like to have on each node.
 - Optionally, provide a desired RavenDB image tag (`latest` by default).
@@ -27,10 +27,11 @@ Before installation you should customize `values.yaml`.
 ```yaml
 domain: "ravendb.poisson.net"
 ravenImageTag: latest
-packageFilePath: misc/pack.zip
+packageFileGlobPath: misc/pack.zip
 storageSize: 5Gi
 ingressClassName: nginx
 imagePullPolicy: IfNotPresent
+license: < license json >
 
 nodes:
   - nodeTag: "A"
