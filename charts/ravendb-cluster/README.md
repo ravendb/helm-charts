@@ -1,3 +1,4 @@
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/ravendb-cluster)](https://artifacthub.io/packages/search?repo=ravendb-cluster)
 # Secured RavenDB Cluster Helm Chart ☸️
 
 ## Overview
