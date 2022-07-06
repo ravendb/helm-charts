@@ -18,15 +18,8 @@ cd /ravendb
 unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
 cd ravendb-setup-package-copy/A
 
-# fetch domain name and validate it
-echo "Validating domain name..."
-domain_name=$( jq -r .PublicServerUrl settings.json | cut -d. -f2- | cut -d: -f1 )
 
-domain_name_values="$(cat /ravendb/scripts/domain)"
-if [ "$domain_name" != "$domain_name_values" ]; then
-    echo "Domain name '$domain_name_values' from values.yaml doesn't match domain name '$domain_name' from the .zip package."
-    exit
-fi
+domain_name="$(cat /ravendb/scripts/domain)"
 
 # convert .pfx to .pem
 echo "Converting pfx to pem..."
