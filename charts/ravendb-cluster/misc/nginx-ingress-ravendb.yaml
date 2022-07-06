@@ -373,19 +373,19 @@ spec:
     targetPort: http
   - appProtocol: tcp
     name: a-tcp
-    port: 38887
+    port: 38881
     protocol: TCP
-    targetPort: 38887
+    targetPort: 38881
   - appProtocol: tcp
     name: b-tcp
-    port: 38888
+    port: 38882
     protocol: TCP
-    targetPort: 38888
+    targetPort: 38882
   - appProtocol: tcp
     name: c-tcp
-    port: 38889
+    port: 38883
     protocol: TCP
-    targetPort: 38889
+    targetPort: 38883
   - appProtocol: https
     name: https
     port: 443
