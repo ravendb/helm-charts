@@ -69,7 +69,7 @@ class ClusterChartConfig:
         self.letsencrypt_email = letsencrypt_email
         self.package_file_glob_path = os.path.relpath(
             os.path.join(os.path.dirname(__file__), SETUP_PACKAGE_PATH), CHART_PATH
-        )
+        ).replace("\\","/")
         self.image_pull_policy = "IfNotPresent"
         self.storage_size = "5Gi"
 
@@ -116,7 +116,7 @@ def get_cluster_info_from_setup_package(
     # Gather settings json hooks
     for file_name in os.listdir("./package"):
         if not os.path.isdir(f"./package/{file_name}"):
-            break
+            continue
         with open(f"./package/{file_name}/settings.json") as settings_json_ref:
             settings = json.loads(settings_json_ref.read())
             port = settings["PublicServerUrl.Tcp"].split(":")[-1]
