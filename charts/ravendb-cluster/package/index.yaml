@@ -3,12 +3,12 @@ entries:
   ravendb:
   - apiVersion: v1
     appVersion: "5.3"
-    created: "2022-06-01T09:41:05.3700933+02:00"
+    created: "2022-07-06T12:21:20.6330515+02:00"
     description: Chart for RavenDB Cluster
-    digest: 628721e4f4a770853f2d8b5fe6edd906d6b6d17f0c29374067cb3b962c7e4a9d
+    digest: 002fddc9fcbcc9be8f1fa1203fae3818ebf0b1440adfcdf3c8c51ee56506d03b
     icon: https://ravendb.net/img/repository-icon.svg
     name: ravendb
     urls:
     - https://ravendb.github.io/helm-charts/charts/ravendb-cluster/package/ravendb-1.0.1.tgz
     version: 1.0.1
-generated: "2022-06-01T09:41:05.3669599+02:00"
+generated: "2022-07-06T12:21:20.6319996+02:00"
