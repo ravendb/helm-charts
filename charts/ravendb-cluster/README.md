@@ -11,7 +11,7 @@ This Helm chart provides all necessary components for the secured RavenDB cluste
 
 
 ### Pre-install
-Run the `generate-values-from-package.py` script. It automatically generates proper `values.yaml` for the Helm chart, based on the setup package. 
+Run the [generate-values-from-package.py](https://github.com/ravendb/helm-charts/tree/master/charts/ravendb-cluster/misc) script. It automatically generates proper `values.yaml` for the Helm chart, based on the setup package. 
 
 Usage: `python ./generate-values-from-package.py [input - path to setup package] [output - path to yaml file] [chart - path to helm chart]`
 
