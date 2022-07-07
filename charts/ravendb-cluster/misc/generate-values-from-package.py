@@ -92,21 +92,21 @@ def get_cluster_info_from_setup_package(
 ) -> ClusterChartConfig:
     try:
         with zipfile.ZipFile(setup_package_zip_path, "r") as zip_file:
-            os.mkdir("./package")
+            os.mkdir("./setup_package")
             letsencrypt_email = None
             node_infos = []
             print(f"Extracting files from {SETUP_PACKAGE_PATH}...")
-            zip_file.extractall("./package")
+            zip_file.extractall("./setup_package")
     except Exception as e:
         raise IOError(
             "Cannot open the setup package file. File not found or is corrupted.", e
         )
 
-    atexit.register(rmtree, "./package")
+    atexit.register(rmtree, "./setup_package")
 
     print("Reading license string..")
 
-    with open("./package/license.json") as license_file_ref:
+    with open("./setup_package/license.json") as license_file_ref:
         ravendb_license_string = license_file_ref.read()
 
     last_settings_json = None
@@ -114,10 +114,10 @@ def get_cluster_info_from_setup_package(
     print("Reading nodes settings..")
 
     # Gather settings json hooks
-    for file_name in os.listdir("./package"):
-        if not os.path.isdir(f"./package/{file_name}"):
+    for file_name in os.listdir("./setup_package"):
+        if not os.path.isdir(f"./setup_package/{file_name}"):
             continue
-        with open(f"./package/{file_name}/settings.json") as settings_json_ref:
+        with open(f"./setup_package/{file_name}/settings.json") as settings_json_ref:
             settings = json.loads(settings_json_ref.read())
             port = settings["PublicServerUrl.Tcp"].split(":")[-1]
             node_tag = settings["PublicServerUrl.Tcp"].split("//")[1][0]
