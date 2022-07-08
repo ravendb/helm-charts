@@ -37,7 +37,7 @@ CHART_PATH = ARGS.chart
 
 
 class NodeInfo:
-    def __init__(self, tag: str): #, tcp_port: int):
+    def __init__(self, tag: str):
         self.node_tag = tag
         self.public_tcp_port = 443
 
@@ -119,9 +119,8 @@ def get_cluster_info_from_setup_package(
             continue
         with open(f"./setup_package/{file_name}/settings.json") as settings_json_ref:
             settings = json.loads(settings_json_ref.read())
-            #port = settings["PublicServerUrl.Tcp"].split(":")[-1]
             node_tag = settings["PublicServerUrl.Tcp"].split("//")[1][0]
-            node_infos.append(NodeInfo(node_tag)) #, port))
+            node_infos.append(NodeInfo(node_tag))
             last_settings_json = settings
 
     print("Checking SetupMode and domain name..")
