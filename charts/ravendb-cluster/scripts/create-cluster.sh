@@ -18,30 +18,38 @@ cd /ravendb
 unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
 cd ravendb-setup-package-copy/A
 
+urls=()
+tags=()
 domain_name="$(cat /ravendb/scripts/domain)"
+
+for i in ../* ; do
+  if [ -d "$i" ]; then
+    tag="$(basename "$i" | tr '[:upper:]' '[:lower:]')"
+    tags+=("$tag")
+    if [ "$tag" != "a" ]; then
+        urls+=("https://a.$domain_name/admin/cluster/node?url=https%3A%2F%2F$tag.$domain_name&tag=$(echo "$tag" | tr '[:lower:]' '[:upper:]')")
+    fi
+  fi
+done
 
 # convert .pfx to .pem
 echo "Converting pfx to pem..."
 openssl pkcs12 -in "$(find ./*certificate*)" -password pass: -out cert.pem -nodes -legacy
 
 # send requests that will create cluster using converted certificate 
-uriB="https://a.$domain_name/admin/cluster/node?url=https%3A%2F%2Fb.$domain_name&watcher=false&tag=B"
-uriC="https://a.$domain_name/admin/cluster/node?url=https%3A%2F%2Fc.$domain_name&watcher=false&tag=C"
-echo "Waiting for nodes to stand up..." 
-
-tags=("a" "b" "c")
-
-
 for tag in "${tags[@]}"
 do
 while ! curl "https://$tag.$domain_name/setup/alive"
 do
-    echo -n "."
+    echo -n "$tag... "
     sleep 3
 done
 done
 
-echo
 echo "Sending requests..."
-curl -L -X PUT "$uriB" --cert cert.pem
-curl -L -X PUT "$uriC" --cert cert.pem
+echo "${urls[@]}"
+for url in "${urls[@]}"
+do
+    echo "Sending request connecting node A with node under the $url"
+    curl -L -X PUT "$url" --cert cert.pem
+done
