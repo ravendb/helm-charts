@@ -18,6 +18,8 @@ cd /ravendb
 unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
 cd ravendb-setup-package-copy/A
 
+# todo: register a client ceritifacte
+
 urls=()
 tags=()
 domain_name="$(cat /ravendb/scripts/domain)"
