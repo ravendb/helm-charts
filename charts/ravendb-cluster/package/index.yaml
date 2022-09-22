@@ -9,6 +9,6 @@ entries:
     icon: https://ravendb.net/img/repository-icon.svg
     name: ravendb
     urls:
-    - package/ravendb-2.0.0.tgz
+    - ravendb-2.0.0.tgz
     version: 2.0.0
 generated: "2022-09-21T15:22:10.8901644+02:00"
