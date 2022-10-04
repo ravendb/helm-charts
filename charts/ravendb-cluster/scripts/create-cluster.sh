@@ -11,7 +11,7 @@ echo "Copying /ravendb/ravendb-setup-package-readonly/pack.zip to the /ravendb f
 cp -v /ravendb/ravendb-setup-package/*.zip /ravendb/pack.zip
 
 
-echo "Extracting files from the pack..."
+echo "Extracting files from the package..."
 mkdir /ravendb/ravendb-setup-package-copy
 cd /ravendb
 unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
@@ -23,7 +23,7 @@ tags=()
 domain_name="$(cat /ravendb/scripts/domain)"
 
 
-echo "Converting pfx to pem..."
+echo "Converting server certificate .pfx file to .pem..."
 openssl pkcs12 -in "$(find ./*certificate*)" -password pass: -out cert.pem -nodes
 
 echo "Discovering tags..."
