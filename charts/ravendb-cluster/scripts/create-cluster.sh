@@ -56,12 +56,10 @@ for tag in "${tags[@]}" ; do
 done
 
 
-echo "Sending requests..."
+echo "Building cluster..."
 echo "${urls[@]}"
 for url in "${urls[@]}"
 do
-    echo "Checking if node A is connected with $url"
-    echo "Sending request connecting node A with node under the $url"
     curl -L -X PUT "$url" --cert cert.pem
 done
 
