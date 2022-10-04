@@ -50,7 +50,7 @@ echo "Figuring out which tags should be called..."
 for tag in "${tags[@]}" ; do
   tag_index="$(curl https://"${tags[0]}"."$domain_name"/cluster/topology -Ss --cert cert.pem |  jq ".Topology.AllNodes | keys | index( \"$tag\" )" )"
   echo "$tag index is: $tag_index"
-  if [ "$tag" != "a" ] && [ "$tag_index" == "null" ]; then
+  if [ "$tag" != "${tags[0]}" ] && [ "$tag_index" == "null" ]; then
       urls+=("https://a.$domain_name/admin/cluster/node?url=https%3A%2F%2F$tag.$domain_name&tag=$(echo "$tag" | tr '[:lower:]' '[:upper:]')")
   fi
 done
