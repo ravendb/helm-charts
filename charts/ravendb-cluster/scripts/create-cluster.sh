@@ -74,7 +74,7 @@ echo "Current cluster size is $cluster_size. Expected cluster size: ${#tags[@]}"
 done
 
 
-echo "Updating client certificate..."
+echo "Registering admin client certificate..."
 node_tag_upper="$(echo "${tags[0]}" | tr '[:lower:]' '[:upper:]')"
 /opt/RavenDB/Server/rvn put-client-certificate \
     "https://${tags[0]}.$domain_name" /ravendb/ravendb-setup-package-copy/"$node_tag_upper"/*.pfx /ravendb/ravendb-setup-package-copy/admin.client.certificate.*.pfx
