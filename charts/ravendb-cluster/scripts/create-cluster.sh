@@ -15,8 +15,11 @@ echo "Extracting files from the package..."
 mkdir /ravendb/ravendb-setup-package-copy
 cd /ravendb
 unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
-cd ravendb-setup-package-copy/A
 
+
+cd ravendb-setup-package-copy
+last_node_tag_caps="$(find . -maxdepth 1 -type d -print | tail -1 | sed s-./--)"
+cd "$last_node_tag_caps"
 
 urls=()
 tags=()
@@ -51,7 +54,7 @@ for tag in "${tags[@]}" ; do
   tag_index="$(curl https://"${tags[0]}"."$domain_name"/cluster/topology -Ss --cert cert.pem |  jq ".Topology.AllNodes | keys | index( \"$tag\" )" )"
   echo "$tag index is: $tag_index"
   if [ "$tag" != "${tags[0]}" ] && [ "$tag_index" == "null" ]; then
-      urls+=("https://a.$domain_name/admin/cluster/node?url=https%3A%2F%2F$tag.$domain_name&tag=$(echo "$tag" | tr '[:lower:]' '[:upper:]')")
+      urls+=("https://${tags[0]}.$domain_name/admin/cluster/node?url=https%3A%2F%2F$tag.$domain_name&tag=$(echo "$tag" | tr '[:lower:]' '[:upper:]')")
   fi
 done
 
