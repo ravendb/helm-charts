@@ -17,9 +17,8 @@ cd /ravendb
 unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
 
 
-cd ravendb-setup-package-copy
-last_node_tag_caps="$(find . -maxdepth 1 -type d -print | tail -1 | sed s-./--)"
-cd "$last_node_tag_caps"
+first_node_tag_caps="$(find ravendb-setup-package-copy -maxdepth 1 -type d -printf '%P\n' | head -2 | tail -1)" 
+cd "ravendb-setup-package-copy/${first_node_tag_caps}"
 
 urls=()
 tags=()
