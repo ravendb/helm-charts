@@ -23,9 +23,9 @@ the chart is located under the `charts/ravendb-cluster` directory
 ---
 or **via [artifacthub.io](https://artifacthub.io/packages/helm/ravendb-cluster/ravendb)**
 
-`helm repo add ravendb-cluster https://ravendb.github.io/helm-charts/charts/ravendb-cluster/package/`
+`helm repo add ravendb https://ravendb.github.io/helm-charts/charts`
 
-`helm install [name] ravendb-cluster/ravendb --set-file package=[setup/package/path] -f [values/yaml/path]`
+`helm install [your-custom-name] ravendb/ravendb-cluster --set-file package=[setup/package/path] -f [values/yaml/path]`
 
 ---
 Before installation you should run [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) to generate helm **values.yaml** and a **setup package**:
@@ -69,29 +69,6 @@ environment:
   SOME_OTHER_ENV_VALUE: 'bar'
 ```
  
-
----
-## How do I make this work?
----
-## Configure your DNS 
-
-Make sure that your DNS contains records that translate RavenDB nodes addresses to the ingress controller IP address. Pods need these to talk to each self. You need to translate 
-- `<nodeTag>.[domain]`
-- `<nodeTag>-tcp.[domain]`
-
-names to ingress controller IP address.
-
-
-*e.g. Additional record inside /etc/hosts file, `192.168.1.15` is my local IP address, running nginx on local machine k8s cluster*
-
-```
-192.168.1.15 a.raven.domain.com b.raven.domain.com c.raven.domain.com 
-192.168.1.15 a-tcp.raven.domain.com b-tcp.raven.domain.com c-tcp.raven.domain.com 
-```
-
-*Dns records can't point to localhost/loopback/0.0.0.0, basically it'll tell the pods to reach nginx on themselves, not on our machine - use your local IP address.*
-
----
 ## Set up your ingress controller
 
 It must be able to **passthrough SSL** like Nginx/HAProxy.
