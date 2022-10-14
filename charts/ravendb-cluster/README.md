@@ -2,17 +2,19 @@
 # Secured RavenDB Cluster Helm Chart ☸️
 
 ## Overview
-This Helm chart provides all necessary components for the secured RavenDB cluster. It's very easy to deploy & manage your own RavenDB cluster by using it.
+This Helm chart provides all necessary components for the secured RavenDB cluster. It's very easy to deploy & manage your own RavenDB cluster by using it. You only need a RavenDB license and the *setup package*.
 
-## Prerequisites 
-- RavenDB License (obtained via https://ravendb.net - also works with the free developer license)
-- The [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) - it generates proper *setup package* and *values.yaml* for you 
-
-- *Alternativelly you could get package via the setup wizard or write values.yaml by yourself, but we highly recommend using the script*
 
 ## Installation
+*To get mentioned files read the section below*
 
-By *cloning* the repo
+**via [artifacthub.io](https://artifacthub.io/packages/helm/ravendb-cluster/ravendb)**
+
+`helm repo add ravendb https://ravendb.github.io/helm-charts/charts`
+
+`helm install [your-custom-name] ravendb/ravendb-cluster --set-file package=[setup/package/path] -f [values/yaml/path]`
+
+or by *cloning* the repo
 
 `git clone https://github.com/ravendb/helm-charts.git`
 
@@ -21,19 +23,21 @@ By *cloning* the repo
 the chart is located under the `charts/ravendb-cluster` directory
 
 ---
-or **via [artifacthub.io](https://artifacthub.io/packages/helm/ravendb-cluster/ravendb)**
 
-`helm repo add ravendb https://ravendb.github.io/helm-charts/charts`
+## Pre-requirements
+- RavenDB License (obtained via https://ravendb.net - also works with the free developer license)
+- The [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) - it generates proper *setup package* and *values.yaml* for you 
 
-`helm install [your-custom-name] ravendb/ravendb-cluster --set-file package=[setup/package/path] -f [values/yaml/path]`
+- Running ingress controller (*see the content below*)
 
----
-Before installation you should run [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) to generate helm **values.yaml** and a **setup package**:
+ *Alternativelly you could get package via the setup wizard or write values.yaml by yourself, but we highly recommend using the script.*
+
+Run [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) to generate helm **values.yaml** and a **setup package**:
 
 `rvn create-setup-package -m=[setup-mode] -s="[path/to/create-setup-package-setup.json]" -o=[package output path] --generate-helm-values [yaml output path] `
 
----
-Then, you might want to customize generated `values.yaml`, where you can:
+----
+You might want to customize generated `values.yaml`, you can...
 - Enter how big should be `storageSize` on each node.
 
 - Provide custom `ingressClassName` (e.g. haproxy...)
