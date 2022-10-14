@@ -28,8 +28,14 @@ Alternatively you could get package via the Setup Wizard or prepare *values.yaml
 Run [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) to generate helm **values.yaml** and a **setup package**:
 
 ```bash
+
+# Scaffold rvn's setup.json file optional
+rvn init-setup-params -m=[setup-mode] -o ./setup.json
+
 rvn create-setup-package -m=[setup-mode] -s="[path/to/create-setup-package-setup.json]" -o=[package output path] --generate-helm-values [yaml output path]
 ```
+
+If in doubt try `rvn [command] --help`.
 
 ##### Customize Helm values.yaml file
 
