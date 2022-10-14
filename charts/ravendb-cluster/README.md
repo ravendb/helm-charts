@@ -29,10 +29,12 @@ Run [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) to generate he
 
 ```bash
 
-# Scaffold rvn's setup.json file optional
+# Scaffold rvn's setup.json file (optional)
 rvn init-setup-params -m=[setup-mode] -o ./setup.json
 
+# Create RavenDB Setup Package
 rvn create-setup-package -m=[setup-mode] -s="[path/to/create-setup-package-setup.json]" -o=[package output path] --generate-helm-values [yaml output path]
+
 ```
 
 If in doubt try `rvn [command] --help`.
