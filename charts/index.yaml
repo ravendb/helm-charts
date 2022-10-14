@@ -3,12 +3,12 @@ entries:
   ravendb-cluster:
   - apiVersion: v1
     appVersion: "5.3"
-    created: "2022-10-13T11:15:04.9359109+02:00"
+    created: "2022-10-14T10:43:29.0716663+02:00"
     description: Chart for RavenDB Cluster
-    digest: ba3886865910dee71dda97592f9811e674da05740dc04cc3e6ebe5f570ea999b
+    digest: 4fddf0d783b03f419af9dc1691ac4402cf5ee5357b920d4de62633ed34cb6e8f
     icon: https://ravendb.net/img/repository-icon.svg
     name: ravendb-cluster
     urls:
-    - ravendb-cluster/package/ravendb-2.0.1.tgz
-    version: 2.0.1
-generated: "2022-10-13T11:15:04.9349116+02:00"
+    - ravendb-cluster/package/ravendb-cluster-2.0.2.tgz
+    version: 2.0.2
+generated: "2022-10-14T10:43:29.07061+02:00"
