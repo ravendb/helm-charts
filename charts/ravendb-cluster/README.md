@@ -27,7 +27,9 @@ Alternatively you could get package via the Setup Wizard or prepare *values.yaml
 
 Run [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) to generate helm **values.yaml** and a **setup package**:
 
-`rvn create-setup-package -m=[setup-mode] -s="[path/to/create-setup-package-setup.json]" -o=[package output path] --generate-helm-values [yaml output path] `
+```bash
+rvn create-setup-package -m=[setup-mode] -s="[path/to/create-setup-package-setup.json]" -o=[package output path] --generate-helm-values [yaml output path]
+```
 
 ##### Customize Helm values.yaml file
 
@@ -101,22 +103,28 @@ https://serversforhackers.com/c/using-ssl-certificates-with-haproxy
 
 **via [artifacthub.io](https://artifacthub.io/packages/helm/ravendb-cluster/ravendb)**
 
-`helm repo add ravendb https://ravendb.github.io/helm-charts/charts`
+```
+helm repo add ravendb https://ravendb.github.io/helm-charts/charts
 
-`helm install [your-custom-name] ravendb/ravendb-cluster --set-file package=[setup/package/path] -f [values/yaml/path]`
+helm install [your-custom-name] ravendb/ravendb-cluster --set-file package=[setup/package/path] -f [values/yaml/path]
+```
 
 or by *cloning* the repo
 
-`git clone https://github.com/ravendb/helm-charts.git`
+```
+git clone https://github.com/ravendb/helm-charts.git
 
-`helm install [name] [chart path] --set-file package=[setup/package/path] -f [values/yaml/path]`
+helm install [name] [chart path] --set-file package=[setup/package/path] -f [values/yaml/path]
+```
 
-the chart is located under the `charts/ravendb-cluster` directory
+The chart is located under the `charts/ravendb-cluster` directory.
 
 ## Rolling updates
 
 You can perform rolling update using the `rolling-update.sh` script located in the `/scripts` directory. Provide desired RavenDB image tag from the DockerHub https://hub.docker.com/r/ravendb/ravendb/tags as the first arg and path to the Helm chart as the second.
 
-`./rolling-update.sh latest ~/ravendb-cluster`
+```
+./rolling-update.sh latest ~/ravendb-cluster
+```
 
 It'll execute rolling update strategy and update your pods image tags.
