@@ -17,7 +17,7 @@ cd /ravendb
 unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
 
 
-first_node_tag_caps="$(find ravendb-setup-package-copy -maxdepth 1 -type d -printf '%P\n' | head -2 | tail -1)" 
+first_node_tag_caps="$(find ravendb-setup-package-copy -mindepth 1 -maxdepth 1 -type d -printf '%P\n' | sort | head -1)" 
 cd "ravendb-setup-package-copy/${first_node_tag_caps}"
 
 urls=()
@@ -26,7 +26,7 @@ domain_name="$(cat /ravendb/scripts/domain)"
 
 
 echo "Converting server certificate .pfx file to .pem..."
-openssl pkcs12 -in "$(find ./*certificate*)" -password pass: -out cert.pem -nodes
+openssl pkcs12 -legacy -in "$(find ./*certificate*)" -password pass: -out cert.pem -nodes
 
 echo "Discovering tags..."
 for i in ../* ; do
@@ -78,6 +78,6 @@ done
 
 echo "Registering admin client certificate..."
 node_tag_upper="$(echo "${tags[0]}" | tr '[:lower:]' '[:upper:]')"
-/opt/RavenDB/Server/rvn put-client-certificate \
+/usr/lib/ravendb/server/rvn put-client-certificate \
     "https://${tags[0]}.$domain_name" /ravendb/ravendb-setup-package-copy/"$node_tag_upper"/*.pfx /ravendb/ravendb-setup-package-copy/admin.client.certificate.*.pfx
 
