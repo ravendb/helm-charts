@@ -103,13 +103,13 @@ spec:
           - name: ravendb-certs
             mountPath: /ravendb/certs
           - name: "ravendb"
-            mountPath: /opt/RavenDB/Server/RavenData
+            mountPath: /var/lib/ravendb/data
 
       volumes:
         - name: ravendb-scripts
           configMap:
             name: ravendb-scripts
-            defaultMode: 0700
+            defaultMode: 0755
         - name: ravendb-certs
           secret:
             secretName: ravendb-certs

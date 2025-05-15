@@ -23,6 +23,9 @@ spec:
     imagePullPolicy: {{ $.Values.imagePullPolicy }}
     command: ["/bin/bash"]
     args: ["/ravendb/scripts/create-cluster.sh"]
+    securityContext:
+     runAsUser: 0
+     runAsGroup: 0
     volumeMounts:
       - name: ravendb-scripts
         mountPath: /ravendb/scripts
