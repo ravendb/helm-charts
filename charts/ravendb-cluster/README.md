@@ -18,14 +18,15 @@ If you have these, you can jump straight to [Installation](#installation).
 
 #### Getting the license
 
-To run this Helm chart you need to acquire RavenDB on-premise license. You can obtain one on https://ravendb.net. Free or Developer license (not for production use) would do as well.
+To run this Helm chart you need to acquire a RavenDB license. A free community license is available for production and can be obtained [here](https://ravendb.net/buy). If you just try things out off-prod, you can get a free developer license [here](https://ravendb.net/license/request/dev). 
+
 
 #### Creating a RavenDB Setup Package
 
-To create RavenDB Setup Package you can use [RavenDB Setup Wizard](https://ravendb.net/docs/article-page/latest/csharp/start/installation/setup-wizard) or `rvn` command line utility. The [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) utility generates proper *Setup Package* and *values.yaml* for you.
-Alternatively you could get package via the Setup Wizard or prepare *values.yaml* yourself, but we highly recommend using the `rvn` utility.
+This package contains certificates and the initial configuration required to initialize the cluster.
+To create RavenDB Setup Package you can use the [rvn](https://github.com/ravendb/ravendb/tree/v7.0/tools/rvn) command line utility. The rvn utility generates proper Setup Package and values.yaml for you. 
 
-Run [rvn](https://github.com/ravendb/ravendb/tree/v5.4/tools/rvn) to generate helm **values.yaml** and a **setup package**:
+Run rvn to generate helm values.yaml and a setup package:
 
 ```bash
 
@@ -39,19 +40,16 @@ rvn create-setup-package -m=[setup-mode] -s="[path/to/create-setup-package-setup
 
 If in doubt try `rvn [command] --help`.
 
+
 ##### Customize Helm values.yaml file
 
-You might want to customize generated `values.yaml`, you can:
-
+Once the setup package generated, the `values.yaml` file can be fine-tuned for your environment.
+Key configuration options include:
 - Define `storageSize` for each node.
+- Provide custom `ingressClassName` (It’s mandatory to pick ingress controller for your cluster that will handle reverse proxying. It comes with a Kubernetes ingress class name - e.g. `nginx`, `traefik`, `haproxy`… - type one that you have installed)
+- Select desired RavenDB image tag. It is latest by default, but we don't recommend using this tag on production (due to its floating nature), tags on [DockerHub](https://hub.docker.com/r/ravendb/ravendb/tags).
 
-- Provide custom `ingressClassName` (e.g. haproxy...)
-
-- Select desired RavenDB image tag. It is `latest` by default, but we don't recommend using this tag on production (due to its floating nature), [tags on DockerHub](https://hub.docker.com/r/ravendb/ravendb/tags)
-
-- In some cases you might want to edit [image pull policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy).
-
-- If you need to put environment variables on your RavenDB container, you can define them in the `environment` map.
+- In some cases you might want to edit the [image pull policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy).
 
 ##### Example values.yaml
 
@@ -80,33 +78,46 @@ environment:
 
 #### Set up your ingress controller
 
-It must be able to **passthrough SSL** like Nginx/HAProxy.
+When deploying a secure RavenDB cluster in Kubernetes, your ingress controller must support **SSL passthrough**. This is essential because RavenDB uses TLS for both HTTPS and TCP traffic, and the TLS connection must be terminated **at the RavenDB server itself**, not by the ingress controller. This allows proper handling of client certificates, SNI (Server Name Indication), and secure cluster communications.
+
+
 
 ##### NGINX
 
-Use `--enable-ssl-passthrough` option.
+To use NGINX as your ingress controller, ensure it is deployed with SSL passthrough enabled using the `--enable-ssl-passthrough` flag.
 
 If you've deployed k8s nginx before, its dependencies are frequently stored in the 'ingress-nginx' namespace.
 You can deploy nginx to k8s using the `nginx-ingress-ravendb.yaml` file located in the misc folder, which is preconfigured for default nodes/tags/ports and secured connection.
 It is not necessary, but running `kubectl delete all --all -n ingress-nginx` should delete all nginx k8s depts before another deployment.
 Run `kubectl apply -f [path to 'nginx-ingress-ravendb' file]` to either update or install well configured nginx ingress controller locally.
 
+> **Note:** When using the `nginx-ingress-ravendb.yaml` configuration, you must advertise the TCP endpoint using port 443 in your `setup.json`—for example:  
+> `"PublicTcpServerUrl": "tcp://a.my-domain.development.run:443"`  
+>
+> This is required because the NGINX Ingress Controller (configured with `--enable-ssl-passthrough`) only exposes TCP via port 443.  
+
 If you want to configure it manually, make sure that...
 - ... port 38888 (or your own ServerUrl_Tcp port) is exposed on the nginx controller pod
 - ... --enable-ssl-passthrough is set (when working with secured cluster)
 
+
 ##### HAProxy, Traefik and others
 
-Change the `ingressClassName` in the `values.yaml`, enter your deployed ingress class name.
-
-e.g. `ingressClassName: haproxy`
+If you're using a different ingress controller like HAProxy or Traefik.
+Update the ingressClassName ingressClassName in your values.yaml  ile to match the class name used by your deployed ingress controller. 
+For example:
+`ingressClassName: haproxy`
 
 **Remember to enable SSL passtrough on your ingress controller**
 
-https://doc.traefik.io/traefik/routing/routers/#passthrough
+Ensure SSL passthrough is enabled in your controller configuration. This is critical for preserving the encrypted connection all the way to the RavenDB server.
+Relevant documentation:
 
-https://serversforhackers.com/c/using-ssl-certificates-with-haproxy
+[Traefik - TLS Passthrough Configuration](https://doc.traefik.io/traefik/routing/routers/#passthrough)
+
+[HAProxy - Using SSL Certificates](https://serversforhackers.com/c/using-ssl-certificates-with-haproxy)
  
+
 ### Installation
 
 **via [artifacthub.io](https://artifacthub.io/packages/helm/ravendb-cluster/ravendb)**
