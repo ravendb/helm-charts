@@ -9,6 +9,6 @@ entries:
     icon: https://ravendb.net/img/repository-icon.svg
     name: ravendb-cluster
     urls:
-    - package/ravendb-cluster-2.0.3.tgz
+    - ravendb-cluster/package/ravendb-cluster-2.0.3.tgz
     version: 2.0.3
 generated: "2025-05-26T15:45:58.2882871+02:00"
