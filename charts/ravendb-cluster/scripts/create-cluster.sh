@@ -17,19 +17,17 @@ cd /ravendb
 unzip -qq pack.zip -d ./ravendb-setup-package-copy/ > /dev/null
 
 
-first_node_tag_caps="$(find ravendb-setup-package-copy -mindepth 1 -maxdepth 1 -type d -printf '%P\n' | sort | head -1)" 
-cd "ravendb-setup-package-copy/${first_node_tag_caps}"
-
 urls=()
 tags=()
 domain_name="$(cat /ravendb/scripts/domain)"
 
 
-echo "Converting server certificate .pfx file to .pem..."
-openssl pkcs12 -legacy -in "$(find ./*certificate*)" -password pass: -out cert.pem -nodes
+echo "Converting admin client certificate .pfx file to .pem..."
+cd /ravendb/ravendb-setup-package-copy
+openssl pkcs12 -legacy -in admin.client.certificate.*.pfx -password pass: -out cert.pem -nodes
 
 echo "Discovering tags..."
-for i in ../* ; do
+for i in * ; do
   if [ -d "$i" ]; then
     tag="$(basename "$i" | tr '[:upper:]' '[:lower:]')"
     tags+=("$tag")
