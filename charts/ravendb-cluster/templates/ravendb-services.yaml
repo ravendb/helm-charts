@@ -12,6 +12,7 @@ metadata:
 spec:
   ports:
   - port: 443
+    targetPort: 8080
     name: https
   - port: 38888
     protocol: TCP
