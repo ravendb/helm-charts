@@ -13,4 +13,5 @@ data:
 {{ (.Files.Glob "scripts/get-server-cert.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/update-cert.sh").AsConfig | indent 2 }}
 {{ (.Files.Glob "scripts/initialize-pod.sh").AsConfig | indent 2 }}
+{{ (.Files.Glob "scripts/trust-admin-cert.sh").AsConfig | indent 2 }}
   domain: {{.Values.domain}}

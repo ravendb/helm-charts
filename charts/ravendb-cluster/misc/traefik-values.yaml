@@ -1,0 +1,19 @@
+# Minimal Traefik configuration for RavenDB cluster
+
+# Dashboard (dev only)
+additionalArguments:
+  - "--api.insecure=true"
+  - "--api.dashboard=true"
+
+# Entry points for RavenDB (443 for both HTTPS and TCP URLs)
+ports:
+  websecure:
+    port: 8443
+    exposedPort: 443
+    expose:
+      default: true
+
+# Enable Kubernetes CRD
+providers:
+  kubernetesCRD:
+    enabled: true

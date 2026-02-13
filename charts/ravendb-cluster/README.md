@@ -1,6 +1,10 @@
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/ravendb-cluster)](https://artifacthub.io/packages/search?repo=ravendb-cluster)
 # Secured RavenDB Cluster Helm Chart ☸️
 
+
+**Note:** For faster & more streamlined deployments, with not only day-0, but also day-1 support, please consider using [RavenDB Kubernetes Operator](https://github.com/ravendb/ravendb-operator). It provides a fully automated way to deploy and manage secure RavenDB clusters on Kubernetes. It handles certificate management, bootstrapping, rolling upgrades with safety gates, external access, persistent storage orchestration, node lifecycle management, and continuous health and status evaluation - all driven from a single RavenDBCluster custom resource. 
+
+
 ## Overview
 This Helm chart provides all necessary components for the secured RavenDB cluster. It's very easy to deploy & manage your own RavenDB cluster by using it. You only need a RavenDB license and the *setup package*.
 
@@ -16,12 +20,12 @@ This Helm chart provides all necessary components for the secured RavenDB cluste
 
 If you have these, you can jump straight to [Installation](#installation).
 
-#### Getting the license
+### Getting the license
 
 To run this Helm chart you need to acquire a RavenDB license. A free community license is available for production and can be obtained [here](https://ravendb.net/buy). If you just try things out off-prod, you can get a free developer license [here](https://ravendb.net/license/request/dev). 
 
 
-#### Creating a RavenDB Setup Package
+### Creating a RavenDB Setup Package
 
 This package contains certificates and the initial configuration required to initialize the cluster.
 To create RavenDB Setup Package you can use the [rvn](https://github.com/ravendb/ravendb/tree/v7.0/tools/rvn) command line utility. The rvn utility generates proper Setup Package and values.yaml for you. 
@@ -29,36 +33,83 @@ To create RavenDB Setup Package you can use the [rvn](https://github.com/ravendb
 Run rvn to generate helm values.yaml and a setup package:
 
 ```bash
-
 # Scaffold rvn's setup.json file (optional)
 rvn init-setup-params -m=[setup-mode] -o ./setup.json
+```
+Where setup-mode is 'lets-encrypt', 'own-certificate' or 'unsecured'.
 
+Example `setup.json` after customization:
+```json
+{
+  "License": {
+    "Id": "...",
+    "Name": "...",
+    "Keys": [
+             "",
+             ""
+         ]
+  },
+  "Email": "example@domain.com",
+  "Domain": "domain-name-to-claim",
+  "RootDomain": "development.run", 
+  "NodeSetupInfos": {
+    "A": {
+      "PublicServerUrl": "https://a.domain-name-to-claim.development.run",
+      "PublicTcpServerUrl": "tcp://a-tcp.domain-name-to-claim.development.run:38888",
+      "Port": 443,
+      "TcpPort": 38888,
+      "Addresses": [
+        "0.0.0.0"
+      ]
+    },
+    "B": {
+      "PublicServerUrl": "https://b.domain-name-to-claim.development.run",
+      "PublicTcpServerUrl": "tcp://b-tcp.domain-name-to-claim.development.run:38888",
+      "Port": 443,
+      "TcpPort": 38888,
+      "Addresses": [
+        "0.0.0.0"
+      ]
+    },
+    "C": {
+      "PublicServerUrl": "https://c.domain-name-to-claim.development.run",
+      "PublicTcpServerUrl": "tcp://c-tcp.domain-name-to-claim.development.run:38888",
+      "Port": 443,
+      "TcpPort": 38888,
+      "Addresses": [
+        "0.0.0.0"
+      ]
+    }
+  }
+}
+```
+
+```bash
 # Create RavenDB Setup Package
-rvn create-setup-package -m=[setup-mode] -s="[path/to/create-setup-package-setup.json]" -o=[package output path] --generate-helm-values [yaml output path]
-
+rvn create-setup-package -m=[setup-mode] -s="[path/to/create-setup-package-setup.json]" -o=[package output path] --generate-helm-values="[yaml output path]"
 ```
 
 If in doubt try `rvn [command] --help`.
 
 
-##### Customize Helm values.yaml file
+### Customize Helm values.yaml file
 
 Once the setup package generated, the `values.yaml` file can be fine-tuned for your environment.
 Key configuration options include:
 - Define `storageSize` for each node.
-- Provide custom `ingressClassName` (It’s mandatory to pick ingress controller for your cluster that will handle reverse proxying. It comes with a Kubernetes ingress class name - e.g. `nginx`, `traefik`, `haproxy`… - type one that you have installed)
 - Select desired RavenDB image tag. It is latest by default, but we don't recommend using this tag on production (due to its floating nature), tags on [DockerHub](https://hub.docker.com/r/ravendb/ravendb/tags).
 
 - In some cases you might want to edit the [image pull policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy).
 
-##### Example values.yaml
+- Provide custom `ingressClassName` if you plan on using Ingress-based external access solution. If you want to use Traefik, leave it unset. 
+
+#### Example values.yaml
 
 ```yaml
 # customizable
 storageSize: 5Gi
 ravenImageTag: latest
 imagePullPolicy: IfNotPresent
-ingressClassName: nginx
 
 # these values are generated by the script and shouldn't be changed
 nodeTags:
@@ -76,14 +127,71 @@ environment:
   SOME_OTHER_ENV_VALUE: 'bar'
 ```
 
-#### Set up your ingress controller
+## External Access & ingress controllers
 
 When deploying a secure RavenDB cluster in Kubernetes, your ingress controller must support **SSL passthrough**. This is essential because RavenDB uses TLS for both HTTPS and TCP traffic, and the TLS connection must be terminated **at the RavenDB server itself**, not by the ingress controller. This allows proper handling of client certificates, SNI (Server Name Indication), and secure cluster communications.
 
+### Traefik
+Traefik natively supports TCP routing through [IngressRouteTCP](https://doc.traefik.io/traefik/reference/routing-configuration/kubernetes/crd/tcp/ingressroutetcp/). It's a recommended external access solution for RavenDB clusters that live inside Kubernetes. 
+
+#### Installation
+ 
+Step 1: Add Traefik Helm Repository:
+ ```bash
+helm repo add traefik https://traefik.github.io/charts
+helm repo update
+ ```
+
+Step 2: Install Traefik using Helm & custom values.yaml (misc/traefik-values.yaml):
+```bash
+helm install traefik traefik/traefik --namespace traefik --create-namespace -f .\misc\traefik-values.yaml
+```
+
+Step 3: Create and Apply IngressRouteTCP Definitions. You can find an example in the `misc/ingress-route-tcp-example.yaml` file. 
+Example `IngressRouteTCP` definition:
+```yaml
+# ingressRouteTCP.yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: ravendb-a-https
+  namespace: ravendb
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostSNI(`a.example.run`)
+      services:
+        - name: ravendb-a
+          port: 443
+  tls:
+    passthrough: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: ravendb-a-tcp
+  namespace: ravendb
+spec:
+  entryPoints:
+    - ravendb-tcp
+  routes:
+    - match: HostSNI(`a-tcp.example.run`)
+      services:
+        - name: ravendb-a
+          port: 38888
+  tls:
+    passthrough: true
+---
+# ... repeat for each node tag ...
+```
+
+### NGINX
+
+**Warning**: ingress-nginx is **deprecated** (https://www.kubernetes.dev/blog/2025/11/12/ingress-nginx-retirement/) and no longer supported. The contnet below is left for historical reasons. To use it anyway, you need to explicitly define `ingressClassName: nginx` in your `values.yaml`.
 
 
-##### NGINX
-
+```
 To use NGINX as your ingress controller, ensure it is deployed with SSL passthrough enabled using the `--enable-ssl-passthrough` flag.
 
 If you've deployed k8s nginx before, its dependencies are frequently stored in the 'ingress-nginx' namespace.
@@ -99,24 +207,16 @@ Run `kubectl apply -f [path to 'nginx-ingress-ravendb' file]` to either update o
 If you want to configure it manually, make sure that...
 - ... port 38888 (or your own ServerUrl_Tcp port) is exposed on the nginx controller pod
 - ... --enable-ssl-passthrough is set (when working with secured cluster)
+```
+
+### Other external access solutions
+
+If you're using any other ingress controller that leverages `Ingress` resource definition, update the `ingressClassName` in your values.yaml file to match the class name used by your deployed ingress controller. 
+For example: `ingressClassName: haproxy`.
+You can request support for your ingress controller by submitting an issue to this repository.
 
 
-##### HAProxy, Traefik and others
-
-If you're using a different ingress controller like HAProxy or Traefik.
-Update the ingressClassName ingressClassName in your values.yaml  ile to match the class name used by your deployed ingress controller. 
-For example:
-`ingressClassName: haproxy`
-
-**Remember to enable SSL passtrough on your ingress controller**
-
-Ensure SSL passthrough is enabled in your controller configuration. This is critical for preserving the encrypted connection all the way to the RavenDB server.
-Relevant documentation:
-
-[Traefik - TLS Passthrough Configuration](https://doc.traefik.io/traefik/routing/routers/#passthrough)
-
-[HAProxy - Using SSL Certificates](https://serversforhackers.com/c/using-ssl-certificates-with-haproxy)
- 
+This Helm chart doesn't support [GatewayAPI](https://gateway-api.sigs.k8s.io/guides/getting-started/), as [TCP routing](https://gateway-api.sigs.k8s.io/guides/tcp/) future support at this point remains unclear. Submit an issue to this repository if you'd like to request this functionality.
 
 ### Installation
 
@@ -133,7 +233,7 @@ or by *cloning* the repo
 ```
 git clone https://github.com/ravendb/helm-charts.git
 
-helm install [name] [chart path] --set-file package=[setup/package/path] -f [values/yaml/path]
+helm install [name] [chart path] --set-file package=[path/to/package.zip] -f [path/to//values.yaml]
 ```
 
 The chart is located under the `charts/ravendb-cluster` directory.

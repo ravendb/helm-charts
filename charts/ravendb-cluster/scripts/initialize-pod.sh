@@ -24,5 +24,18 @@ echo "Reading node tag from the HOSTNAME environmental..."
 node_tag="$(env | grep HOSTNAME | cut -f 2 -d '-')"
 cd "${node_tag^^}"
 
-echo "Updating secret using kubectl get and kubectl apply..."
-kubectl get secret ravendb-certs -o json -n ravendb | jq ".data[\"$node_tag.pfx\"]=\"$(cat ./*certificate* | base64)\"" | kubectl apply -f -
+echo "Updating server certificate secret using kubectl get and kubectl apply..."
+kubectl get secret ravendb-certs -o json -n ravendb | jq ".data[\"$node_tag.pfx\"]=\"$(cat ./*certificate* | base64 -w 0)\"" | kubectl apply -f -
+
+echo "Extracting and updating admin client certificate in secret..."
+cd /ravendb/ravendb-setup-package
+
+# Find the admin cert at root level of package
+admin_cert="$(find . -maxdepth 1 -name 'admin.client.certificate.*.pfx' | head -n 1)"
+if [ -n "$admin_cert" ]; then
+    echo "Found admin certificate: $admin_cert"
+    kubectl get secret ravendb-certs -o json -n ravendb | jq ".data[\"admin.client.certificate.pfx\"]=\"$(cat "$admin_cert" | base64 -w 0)\"" | kubectl apply -f -
+    echo "Admin certificate updated in ravendb-certs secret"
+else
+    echo "WARNING: Admin client certificate not found in setup package"
+fi
