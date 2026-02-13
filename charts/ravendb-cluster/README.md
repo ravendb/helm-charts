@@ -101,7 +101,7 @@ Key configuration options include:
 
 - In some cases you might want to edit the [image pull policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy).
 
-- Provide custom `ingressClassName`. 
+- Provide custom `ingressClassName` if you plan on using Ingress-based external access solution. If you want to use Traefik, leave it unset. 
 
 #### Example values.yaml
 
