@@ -132,8 +132,22 @@ environment:
 When deploying a secure RavenDB cluster in Kubernetes, your ingress controller must support **SSL passthrough**. This is essential because RavenDB uses TLS for both HTTPS and TCP traffic, and the TLS connection must be terminated **at the RavenDB server itself**, not by the ingress controller. This allows proper handling of client certificates, SNI (Server Name Indication), and secure cluster communications.
 
 ### Traefik
-Traefik natively supports TCP routing through [IngressRouteTCP](https://doc.traefik.io/traefik/reference/routing-configuration/kubernetes/crd/tcp/ingressroutetcp/). It's a recommended external access solution for RavenDB clusters that live inside Kubernetes. For detailed deployment guide, follow steps 1-5 from RavenDB Operator [Traefik guide](https://github.com/ravendb/ravendb-operator/blob/main/examples/networking/external_access/traefik/readme.md). This Helm chart deploys a Kubernetes Service for each node tag (e.g. `ravendb-a`, `ravendb-b`, `ravendb-c`) that expose both HTTP(S) and TCP ports, meaning you need to create two IngressRouteTCPs for each node tag (HTTPS and TCP).
+Traefik natively supports TCP routing through [IngressRouteTCP](https://doc.traefik.io/traefik/reference/routing-configuration/kubernetes/crd/tcp/ingressroutetcp/). It's a recommended external access solution for RavenDB clusters that live inside Kubernetes. 
 
+#### Installation
+ 
+Step 1: Add Traefik Helm Repository:
+ ```bash
+helm repo add traefik https://traefik.github.io/charts
+helm repo update
+ ```
+
+Step 2: Install Traefik using Helm & custom values.yaml (misc/traefik-values.yaml):
+```bash
+helm install traefik traefik/traefik --namespace traefik --create-namespace -f .\misc\traefik-values.yaml
+```
+
+Step 3: Create and Apply IngressRouteTCP Definitions. You can find an example in the `misc/ingress-route-tcp-example.yaml` file. 
 Example `IngressRouteTCP` definition:
 ```yaml
 # ingressRouteTCP.yaml
@@ -160,11 +174,11 @@ metadata:
   namespace: ravendb
 spec:
   entryPoints:
-    - tcp
+    - ravendb-tcp
   routes:
     - match: HostSNI(`a-tcp.example.run`)
       services:
-        - name: ravendb-a-tcp
+        - name: ravendb-a
           port: 38888
   tls:
     passthrough: true
