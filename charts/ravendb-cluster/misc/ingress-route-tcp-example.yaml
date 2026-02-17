@@ -1,0 +1,104 @@
+# IngressRouteTCP for RavenDB cluster
+# RavenDB services expose:
+#   - port 443 (service) -> 8080 (pod) for HTTPS
+#   - port 38888 (service) -> 38888 (pod) for TCP cluster communication
+#
+# Routing strategy:
+#   - HTTPS routes: a.domain.run:443 (websecure) -> service:443 -> pod:8080
+#   - TCP routes: a-tcp.domain.run:443 (websecure) -> service:38888 -> pod:38888
+
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: ravendb-a-https
+  namespace: ravendb
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostSNI(`a.yourdomain.development.run`)
+      services:
+        - name: ravendb-a
+          port: 443  # Service port (redirects to pod port 8080)
+  tls:
+    passthrough: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: ravendb-a-tcp
+  namespace: ravendb
+spec:
+  entryPoints:
+    - websecure  # TCP cluster communication also comes on port 443
+  routes:
+    - match: HostSNI(`a-tcp.yourdomain.development.run`)
+      services:
+        - name: ravendb-a
+          port: 38888  # Route to service port 38888 (which goes to pod 38888)
+  tls:
+    passthrough: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: ravendb-b-https
+  namespace: ravendb
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostSNI(`b.yourdomain.development.run`)
+      services:
+        - name: ravendb-b
+          port: 443
+  tls:
+    passthrough: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: ravendb-b-tcp
+  namespace: ravendb
+spec:
+  entryPoints:
+    - websecure  # TCP cluster communication also comes on port 443
+  routes:
+    - match: HostSNI(`b-tcp.yourdomain.development.run`)
+      services:
+        - name: ravendb-b
+          port: 38888  # Route to service port 38888 (which goes to pod 38888)
+  tls:
+    passthrough: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: ravendb-c-https
+  namespace: ravendb
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostSNI(`c.yourdomain.development.run`)
+      services:
+        - name: ravendb-c
+          port: 443
+  tls:
+    passthrough: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: ravendb-c-tcp
+  namespace: ravendb
+spec:
+  entryPoints:
+    - websecure  # TCP cluster communication also comes on port 443
+  routes:
+    - match: HostSNI(`c-tcp.yourdomain.development.run`)
+      services:
+        - name: ravendb-c
+          port: 38888  # Route to service port 38888 (which goes to pod 38888)
+  tls:
+    passthrough: true

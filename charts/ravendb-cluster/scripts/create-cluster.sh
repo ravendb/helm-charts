@@ -63,6 +63,7 @@ do
     curl -L -X PUT "$url" --cert cert.pem
 done
 
+echo "Note: Admin client certificate will be registered on each RavenDB node via postStart lifecycle hook."
 
 cluster_size="1"
 while [ "$cluster_size" != "${#tags[@]}" ]
@@ -73,9 +74,5 @@ echo "Waiting for cluster build-up..."
 echo "Current cluster size is $cluster_size. Expected cluster size: ${#tags[@]}"
 done
 
-
-echo "Registering admin client certificate..."
-node_tag_upper="$(echo "${tags[0]}" | tr '[:lower:]' '[:upper:]')"
-/usr/lib/ravendb/server/rvn put-client-certificate \
-    "https://${tags[0]}.$domain_name" /ravendb/ravendb-setup-package-copy/"$node_tag_upper"/*.pfx /ravendb/ravendb-setup-package-copy/admin.client.certificate.*.pfx
+echo "Cluster creation complete!"
 

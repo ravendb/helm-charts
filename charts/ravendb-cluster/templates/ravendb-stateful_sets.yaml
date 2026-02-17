@@ -46,8 +46,12 @@ spec:
       - name: ravendb-container
         image: "ravendb/ravendb:{{$.Values.ravenImageTag}}"
         imagePullPolicy: {{ $.Values.imagePullPolicy }}
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/bash", "-c", "nohup /ravendb/scripts/trust-admin-cert.sh > /tmp/cert-registration.log 2>&1 &"]
         ports:
-        - containerPort: 443
+        - containerPort: 8080
           name: https
         - containerPort: 38888
           name: tcp
@@ -78,7 +82,7 @@ spec:
           value: 'true'
 
         - name: RAVEN_ServerUrl
-          value: "https://0.0.0.0:443"
+          value: "https://0.0.0.0:8080"
         - name: RAVEN_ServerUrl_Tcp
           value: "tcp://0.0.0.0:38888"
 
